@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gremlin Demo</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #050505;
+            height: 100vh;
+            width: 100vw;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            font-family: 'Fira Code', monospace;
+        }
+
+        /* Navigation Bar */
+        .nav-bar {
+            background: #0d1117;
+            border-bottom: 1px solid #30363d;
+            padding: 12px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 20px;
+        }
+
+        .nav-brand {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .nav-brand-icon {
+            color: #4ade80;
+            font-size: 20px;
+        }
+
+        .nav-brand-text {
+            color: #4ade80;
+            font-size: 14px;
+            font-weight: bold;
+            letter-spacing: 1px;
+        }
+
+        .nav-controls {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .nav-label {
+            color: #8b949e;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .workflow-select {
+            background: #161b22;
+            border: 1px solid #30363d;
+            border-radius: 6px;
+            color: #c9d1d9;
+            font-family: 'Fira Code', monospace;
+            font-size: 13px;
+            padding: 8px 32px 8px 12px;
+            cursor: pointer;
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12' fill='%238b949e'%3E%3Cpath d='M2 4l4 4 4-4'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 10px center;
+            min-width: 280px;
+        }
+
+        .workflow-select:hover {
+            border-color: #4ade80;
+        }
+
+        .workflow-select:focus {
+            outline: none;
+            border-color: #4ade80;
+            box-shadow: 0 0 0 2px rgba(74, 222, 128, 0.2);
+        }
+
+        .workflow-select option {
+            background: #161b22;
+            color: #c9d1d9;
+            padding: 8px;
+        }
+
+        .workflow-badge {
+            background: #238636;
+            color: #fff;
+            font-size: 10px;
+            padding: 3px 8px;
+            border-radius: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            display: flex;
+            overflow: hidden;
+        }
+
+        .panel {
+            flex: 1;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .panel-header {
+            background: #0d1117;
+            color: #4ade80;
+            padding: 8px 16px;
+            font-family: 'Fira Code', monospace;
+            font-size: 12px;
+            font-weight: bold;
+            border-bottom: 1px solid #30363d;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .panel-header-icon {
+            opacity: 0.7;
+        }
+
+        .panel:first-child {
+            border-right: 2px solid #30363d;
+        }
+
+        iframe {
+            flex: 1;
+            width: 100%;
+            border: none;
+            background: #050505;
+        }
+
+        /* Loading State */
+        .loading-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(5, 5, 5, 0.9);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 100;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+        }
+
+        .loading-overlay.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .loading-spinner {
+            color: #4ade80;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .loading-spinner::before {
+            content: '';
+            width: 20px;
+            height: 20px;
+            border: 2px solid #30363d;
+            border-top-color: #4ade80;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Keyboard hint */
+        .keyboard-hint {
+            color: #6e7681;
+            font-size: 11px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .keyboard-hint kbd {
+            background: #21262d;
+            border: 1px solid #30363d;
+            border-radius: 4px;
+            padding: 2px 6px;
+            font-family: 'Fira Code', monospace;
+            font-size: 10px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation Bar -->
+    <nav class="nav-bar">
+        <div class="nav-brand">
+            <span class="nav-brand-icon">&#9881;</span>
+            <span class="nav-brand-text">GREMLIN DEMOS</span>
+        </div>
+
+        <div class="nav-controls">
+            <span class="nav-label">Workflow:</span>
+            <select class="workflow-select" id="workflow-select">
+                <!-- Workflows populated by JS -->
+            </select>
+            <span class="workflow-badge" id="workflow-count">1 workflow</span>
+        </div>
+
+        <div class="keyboard-hint">
+            <kbd>&#8593;</kbd><kbd>&#8595;</kbd> to switch workflows
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <div class="panel" id="cli-panel">
+            <div class="panel-header">
+                <span class="panel-header-icon">&#9658;</span>
+                Interactive CLI Demo
+            </div>
+            <iframe id="cli-iframe" src=""></iframe>
+            <div class="loading-overlay" id="cli-loading">
+                <div class="loading-spinner">Loading CLI Demo...</div>
+            </div>
+        </div>
+        <div class="panel" id="walkthrough-panel">
+            <div class="panel-header">
+                <span class="panel-header-icon">&#9733;</span>
+                Walkthrough Guide
+            </div>
+            <iframe id="walkthrough-iframe" src=""></iframe>
+            <div class="loading-overlay" id="walkthrough-loading">
+                <div class="loading-spinner">Loading Walkthrough...</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Workflow Configuration
+        // Add new workflows here - each needs a cli and walkthrough HTML file in the workflows/ folder
+        const WORKFLOWS = [
+            {
+                id: 'mm-fusion',
+                name: 'Multiple Myeloma Fusion Model',
+                description: 'End-to-end ML workflow: cohort discovery to deployment',
+                cli: 'workflows/mm-fusion-cli.html',
+                walkthrough: 'workflows/mm-fusion-walkthrough.html'
+            }
+            // Add more workflows here:
+            // {
+            //     id: 'example-workflow',
+            //     name: 'Example Workflow Name',
+            //     description: 'Brief description of the workflow',
+            //     cli: 'workflows/example-cli.html',
+            //     walkthrough: 'workflows/example-walkthrough.html'
+            // }
+        ];
+
+        // DOM Elements
+        const select = document.getElementById('workflow-select');
+        const cliIframe = document.getElementById('cli-iframe');
+        const walkthroughIframe = document.getElementById('walkthrough-iframe');
+        const cliLoading = document.getElementById('cli-loading');
+        const walkthroughLoading = document.getElementById('walkthrough-loading');
+        const workflowCount = document.getElementById('workflow-count');
+
+        // Populate dropdown
+        function populateWorkflows() {
+            WORKFLOWS.forEach((workflow, index) => {
+                const option = document.createElement('option');
+                option.value = workflow.id;
+                option.textContent = workflow.name;
+                option.title = workflow.description;
+                select.appendChild(option);
+            });
+
+            // Update badge
+            const count = WORKFLOWS.length;
+            workflowCount.textContent = `${count} workflow${count !== 1 ? 's' : ''}`;
+        }
+
+        // Load a workflow
+        function loadWorkflow(workflowId) {
+            const workflow = WORKFLOWS.find(w => w.id === workflowId);
+            if (!workflow) return;
+
+            // Show loading
+            cliLoading.classList.add('active');
+            walkthroughLoading.classList.add('active');
+
+            // Load iframes
+            cliIframe.src = workflow.cli;
+            walkthroughIframe.src = workflow.walkthrough;
+
+            // Store in URL hash for bookmarking
+            window.location.hash = workflowId;
+        }
+
+        // Handle iframe load
+        cliIframe.addEventListener('load', () => {
+            cliLoading.classList.remove('active');
+        });
+
+        walkthroughIframe.addEventListener('load', () => {
+            walkthroughLoading.classList.remove('active');
+        });
+
+        // Handle workflow selection
+        select.addEventListener('change', (e) => {
+            loadWorkflow(e.target.value);
+        });
+
+        // Keyboard navigation
+        document.addEventListener('keydown', (e) => {
+            if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+
+            const currentIndex = WORKFLOWS.findIndex(w => w.id === select.value);
+
+            if (e.key === 'ArrowUp' || e.key === 'ArrowLeft') {
+                e.preventDefault();
+                const newIndex = currentIndex > 0 ? currentIndex - 1 : WORKFLOWS.length - 1;
+                select.value = WORKFLOWS[newIndex].id;
+                loadWorkflow(WORKFLOWS[newIndex].id);
+            } else if (e.key === 'ArrowDown' || e.key === 'ArrowRight') {
+                e.preventDefault();
+                const newIndex = currentIndex < WORKFLOWS.length - 1 ? currentIndex + 1 : 0;
+                select.value = WORKFLOWS[newIndex].id;
+                loadWorkflow(WORKFLOWS[newIndex].id);
+            }
+        });
+
+        // Initialize
+        function init() {
+            populateWorkflows();
+
+            // Check URL hash for workflow
+            const hash = window.location.hash.slice(1);
+            const initialWorkflow = WORKFLOWS.find(w => w.id === hash) || WORKFLOWS[0];
+
+            if (initialWorkflow) {
+                select.value = initialWorkflow.id;
+                loadWorkflow(initialWorkflow.id);
+            }
+        }
+
+        init();
+    </script>
+</body>
+</html>

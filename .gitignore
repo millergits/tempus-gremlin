@@ -1,0 +1,6 @@
+node_modules/
+dist/
+encrypted/
+.DS_Store
+*.log
+.surge

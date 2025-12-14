@@ -1,0 +1,536 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gremlin CLI</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;600&family=Inter:wght@400;600&display=swap');
+
+        body {
+            background-color: #050505;
+            /* Nearly Black */
+            color: #c9d1d9;
+            overflow: hidden;
+            font-family: 'Fira Code', monospace;
+        }
+
+        /* Terminal Scrollbar */
+        .terminal-scroll::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .terminal-scroll::-webkit-scrollbar-track {
+            background: #0d1117;
+        }
+
+        .terminal-scroll::-webkit-scrollbar-thumb {
+            background: #30363d;
+            border-radius: 4px;
+        }
+
+        .terminal-scroll::-webkit-scrollbar-thumb:hover {
+            background: #484f58;
+        }
+
+        /* Cursor */
+        .cursor {
+            display: inline-block;
+            width: 10px;
+            height: 1.2em;
+            background-color: #4ade80;
+            /* Green */
+            animation: blink 1s step-end infinite;
+            vertical-align: text-bottom;
+        }
+
+        @keyframes blink {
+
+            0%,
+            100% {
+                opacity: 1;
+            }
+
+            50% {
+                opacity: 0;
+            }
+        }
+
+        /* Tables */
+        .term-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1rem 0;
+            font-size: 0.9rem;
+        }
+
+        .term-table th {
+            text-align: left;
+            border-bottom: 1px solid #30363d;
+            color: #8b949e;
+            padding: 0.5rem;
+        }
+
+        .term-table td {
+            padding: 0.5rem;
+            border-bottom: 1px solid #21262d;
+        }
+
+        /* Diff Colors */
+        .diff-add {
+            color: #4ade80;
+        }
+
+        .diff-remove {
+            color: #fdaeb7;
+        }
+
+        .diff-header {
+            color: #8b949e;
+        }
+
+        /* Scanline */
+        .scanline {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(to bottom, rgba(255, 255, 255, 0), rgba(255, 255, 255, 0) 50%, rgba(0, 0, 0, 0.02) 50%, rgba(0, 0, 0, 0.02));
+            background-size: 100% 4px;
+            pointer-events: none;
+            z-index: 10;
+        }
+
+        /* ASCII Art - Single Color */
+        .gremlin-green {
+            color: #4ade80;
+            text-shadow: 0 0 10px rgba(74, 222, 128, 0.3);
+        }
+
+        .ascii-art {
+            font-weight: bold;
+            line-height: 1.1;
+        }
+    </style>
+</head>
+
+<body class="h-screen w-screen flex flex-col p-4 md:p-8 selection:bg-green-500/30 justify-center items-center">
+
+    <div class="scanline"></div>
+
+    <!-- Terminal Window -->
+    <div
+        class="bg-[#0d1117] border border-[#30363d] rounded-lg shadow-2xl flex flex-col overflow-hidden relative w-full max-w-5xl h-[85vh]">
+
+        <!-- Title Bar -->
+        <div class="bg-[#010409] px-4 py-2 flex items-center justify-between border-b border-[#30363d]">
+            <div class="flex space-x-2">
+                <div class="w-3 h-3 rounded-full bg-[#ff5f56]"></div>
+                <div class="w-3 h-3 rounded-full bg-[#ffbd2e]"></div>
+                <div class="w-3 h-3 rounded-full bg-[#27c93f]"></div>
+            </div>
+            <div class="text-xs text-[#8b949e] font-semibold flex items-center">
+                <i class="fa-solid fa-shield-halved mr-2 text-green-500"></i> scientist@tempus-cluster-01
+            </div>
+            <div class="w-12"></div>
+        </div>
+
+        <!-- Content -->
+        <div id="terminal-output" class="flex-grow p-6 overflow-y-auto terminal-scroll text-sm md:text-base font-mono">
+
+            <!-- Welcome Banner -->
+            <div class="mb-8 animate-fade-in flex items-start space-x-6 border-b border-[#30363d] pb-6">
+                <!-- GIZMO ART -->
+                <pre class="gremlin-green text-[10px] md:text-[12px] leading-none hidden md:block">
+         ,           ,
+        / \         / \
+       /   \       /   \
+      /     \     /     \
+     (       \___/       )
+      \   O         O   /
+       \       ^       /
+        \    _____    /
+         \__/     \__/
+                </pre>
+
+                <!-- TEXT LOGO -->
+                <div>
+                    <pre class="ascii-art gremlin-green text-[10px] md:text-xs leading-[1.1]">
+  ____ ____  _____ __  __ _     ___ _   _ 
+ / ___|  _ \| ____|  \/  | |   |_ _| \ | |
+| |  _| |_) |  _| | |\/| | |    | ||  \| |
+| |_| |  _ <| |___| |  | | |___ | || |\  |
+ \____|_| \_\_____|_|  |_|_____|___|_| \_|</pre>
+                    <div class="text-[#8b949e] mt-3 mb-1">Tempus Gremlin CLI <span class="text-green-400">v2.4</span>
+                    </div>
+                    <div class="text-[#c9d1d9] text-[11px] uppercase tracking-wide font-semibold">
+                        <span class="gremlin-green">G</span>ENERATIVE
+                        <span class="gremlin-green">R</span>ESEARCH
+                        <span class="gremlin-green">E</span>NGINE FOR
+                        <span class="gremlin-green">M</span>ACHINE
+                        <span class="gremlin-green">L</span>EARNING
+                        <span class="gremlin-green">I</span>NFRASTRUCTURE &
+                        <span class="gremlin-green">N</span>AVIGATION
+                    </div>
+                </div>
+            </div>
+
+            <!-- History -->
+            <div id="history"></div>
+
+            <!-- Input Line -->
+            <div class="flex items-center mt-4 pb-2" id="input-line">
+                <span class="text-green-400 font-bold mr-2">gremlin ></span>
+                <div class="relative flex-grow">
+                    <input type="text" id="terminal-input"
+                        class="w-full bg-transparent border-none outline-none text-[#e6edf3] font-mono caret-transparent"
+                        autocomplete="off" spellcheck="false" autofocus>
+                    <div id="ghost-text"
+                        class="absolute top-0 left-0 pointer-events-none text-[#e6edf3] opacity-50 whitespace-pre-wrap">
+                    </div>
+                </div>
+                <span class="cursor"></span>
+            </div>
+        </div>
+    </div>
+
+    <!-- PRO TIP BADGE (Static & Centered) -->
+    <div class="fixed bottom-8 left-1/2 -translate-x-1/2 z-50 pointer-events-none opacity-70">
+        <div
+            class="bg-[#0d1117]/90 text-[#8b949e] text-xs px-4 py-2 rounded-full border border-[#30363d] shadow-2xl backdrop-blur-md flex items-center gap-2">
+            <i class="fa-solid fa-terminal text-green-500"></i>
+            <span>Pro Tip: Press <span
+                    class="text-green-400 font-bold font-mono bg-[#30363d] px-1.5 rounded mx-1">TAB</span> to
+                auto-complete commands</span>
+        </div>
+    </div>
+
+    <script>
+        // --- LINEAR SCENARIO SCRIPT ---
+        const endToEndScenario = [
+            {
+                user: "I want to train a fusion model on the Multiple Myeloma cohort (q225). Check if we have enough patients with RNA and valid 1L Time-on-Treatment.",
+                ai: {
+                    think: "Invoking DataTools.check_cohort_availability('mm_curated_q225', ['rna', '1l_tot'])...",
+                    response: `
+                        <div class="text-[#c9d1d9] mb-2">Scanning <span class="text-green-400">mm_curated_q225</span> (Total: 1,402 pts)...</div>
+                        <table class="term-table">
+                            <thead><tr><th>Criteria</th><th>Count</th><th>% Total</th><th>Status</th></tr></thead>
+                            <tbody>
+                                <tr><td>Base Cohort</td><td>1,402</td><td>100%</td><td><span class="text-green-400">✅ Ready</span></td></tr>
+                                <tr><td>Has RNA</td><td>1,374</td><td>98%</td><td><span class="text-green-400">✅ Good Coverage</span></td></tr>
+                                <tr><td>Has 1L TOT</td><td>1,150</td><td>82%</td><td><span class="text-yellow-400">⚠️ High Attrition</span></td></tr>
+                                <tr class="bg-[#21262d] font-bold text-white"><td>Intersection</td><td>1,120</td><td>79%</td><td>✅ Valid for Training</td></tr>
+                            </tbody>
+                        </table>
+                        <div class="mb-4 text-[#8b949e] italic text-xs border-l-2 border-[#30363d] pl-2">
+                            > Note: 1L TOT drop-off is due to missing 'end_date' in 'onco_regimen'.
+                        </div>
+                        <div class="text-[#c9d1d9]"><strong>Action:</strong> Create pinned dataset split <span class="text-purple-400">mm_fusion_v1</span> with these 1,120 patients?</div>
+                    `
+                }
+            },
+            {
+                user: "Yes, create it.",
+                ai: {
+                    think: "Invoking DataTools.create_cohort_split()... Materializing in Atlas...",
+                    response: `
+                        <div class="text-green-400 mb-1">✔ Done.</div>
+                        <div class="text-[#c9d1d9]">Dataset Created: <span class="text-green-400 underline cursor-pointer">atlas://datasets/mm_fusion_v1</span></div>
+                        <div class="text-[#8b949e] text-xs">Pinned to sha256:a8f9e2...</div>
+                    `
+                }
+            },
+            {
+                user: "Configure a Late Fusion experiment. Use the best frozen RNA encoder from 'v3-experiments', standard Clinical encoder, target 'overall_survival'. Use our new dataset.",
+                ai: {
+                    think: "Querying Atlas Registry... Generating YAML config...",
+                    response: `
+                        <div class="text-[#c9d1d9] mb-2">Found best upstream RNA encoder: <strong class="text-green-400">rn_8f92x</strong> (C-Index 0.72).</div>
+                        <div class="text-[#c9d1d9] mb-2">Generated config <span class="text-purple-400">exp_fusion_mm_os.yaml</span>. Diff:</div>
+                        
+                        <div class="bg-[#161b22] p-3 rounded border border-[#30363d] font-mono text-xs mb-4">
+                            <div class="diff-header">model:</div>
+                            <div class="diff-header">&nbsp;&nbsp;architecture: late_fusion</div>
+                            <div class="diff-add">+&nbsp;&nbsp;encoders:</div>
+                            <div class="diff-add">+&nbsp;&nbsp;&nbsp;&nbsp;rna: { checkpoint: "atlas://artifacts/rn_8f92x", trainable: false }</div>
+                            <div class="diff-add">+&nbsp;&nbsp;&nbsp;&nbsp;clinical: { checkpoint: "atlas://registry/cl_base_v2" }</div>
+                            <div class="diff-header">data:</div>
+                            <div class="diff-add">+&nbsp;&nbsp;dataset: "atlas://datasets/mm_fusion_v1"</div>
+                            <div class="diff-header">&nbsp;&nbsp;batch_size: 32 <span class="text-[#8b949e]"># Tuned for A100-40GB</span></div>
+                        </div>
+                        <div class="text-[#c9d1d9]">Validation Passed. <strong>Execute run? [Y/n]</strong></div>
+                    `
+                }
+            },
+            {
+                user: "Y",
+                ai: {
+                    think: "Submitting Ray Job to Hypernexus...",
+                    response: `
+                        <div class="text-[#c9d1d9]">🚀 Job <span class="text-purple-400">job-d92a-fusion</span> submitted to Hypernexus (us-central1).</div>
+                        <div class="text-[#8b949e] mt-2 text-xs font-mono">
+                            [INFO] Initializing distributed group...<br>
+                            [INFO] Loaded RNA weights (2.3s)<br>
+                            [INFO] Training started. Epoch 0/20...<br>
+                            <span class="text-green-400">[SUCCESS] Job completed in 42m 12s.</span>
+                        </div>
+                    `
+                }
+            },
+            {
+                user: "How did it do? Interpret the results.",
+                ai: {
+                    think: "Invoking BenchTools.evaluate_survival()... Analyzing plots...",
+                    response: `
+                        <div class="mb-4">
+                            <div class="text-[#8b949e] text-xs uppercase font-bold mb-1">Scorecard</div>
+                            <table class="term-table" style="width: 60%">
+                                <tr><td>C-Index</td><td class="font-bold text-white">0.68</td><td class="text-red-400">🔻 -0.04 (vs Baseline)</td></tr>
+                                <tr><td>Hazard Ratio</td><td>1.45</td><td class="text-green-400">✅ Significant (p < 0.005)</td></tr>
+                            </table>
+                        </div>
+
+                        <div class="border-l-2 border-[#d29922] pl-4 py-1 bg-[#d29922]/10 mb-4">
+                            <div class="text-[#d29922] font-bold text-sm mb-1">🧐 AI Analysis: Anomaly Detected</div>
+                            <div class="text-[#c9d1d9] text-sm leading-relaxed">
+                                1. <strong>Crossing Curves:</strong> Kaplan-Meier curves cross at t=18 months. Violates Proportional Hazards.
+                                <br>
+                                2. <strong>Embedding Warning:</strong> Metadata shows <code class="text-[#d29922] bg-[#d29922]/20 px-1 rounded">nearest_neighbor</code> embeddings. This often causes leakage.
+                            </div>
+                        </div>
+
+                        <div class="text-[#c9d1d9]">
+                            <strong>Suggestion:</strong> Run an <strong>ablation study</strong> (Clinical-Only) to verify signal strength?
+                        </div>
+                    `
+                }
+            },
+            {
+                user: "Yes, run the ablation.",
+                ai: {
+                    think: "Submitting ablation job...",
+                    response: `
+                        <div class="text-green-400">✔ Ablation job submitted: job-e45b-ablation</div>
+                        <div class="text-[#8b949e] text-xs">Monitoring progress...</div>
+                    `
+                }
+            },
+            {
+                user: "Check the status of the ablation job.",
+                ai: {
+                    think: "Invoking Hypernexus.get_job('job-e45b-ablation')... Fetching metrics from ofm-bench...",
+                    response: `
+                        <div class="text-[#c9d1d9] mb-2">Job <span class="text-purple-400">job-e45b-ablation</span> is <strong class="text-green-400">COMPLETE</strong>.</div>
+                        
+                        <div class="mb-4">
+                            <div class="text-[#8b949e] text-xs uppercase font-bold mb-1">Comparison: Clinical-Only vs Fusion</div>
+                            <table class="term-table" style="width: 70%">
+                                <thead><tr><th>Metric</th><th>Fusion</th><th>Clinical-Only</th><th>Delta</th></tr></thead>
+                                <tbody>
+                                    <tr><td>C-Index</td><td class="text-[#8b949e]">0.68</td><td class="font-bold text-white">0.71</td><td class="text-green-400">▲ +0.03</td></tr>
+                                    <tr><td>Hazard Ratio</td><td class="text-[#8b949e]">1.45</td><td class="font-bold text-white">1.62</td><td class="text-green-400">▲ Better Separation</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <div class="text-[#c9d1d9] border-l-2 border-green-500 pl-3 text-sm">
+                            <strong>Conclusion:</strong> The Clinical-Only model outperforms the Fusion model. This confirms the hypothesis that the RNA modality (or its embedding method) was introducing noise to the signal.
+                        </div>
+                    `
+                }
+            },
+            {
+                user: "Okay, deploy the Clinical-Only model to Inferno.",
+                ai: {
+                    think: "Invoking Inferno.deploy_model('job-e45b-ablation')... Configuring KServe...",
+                    response: `
+                        <div class="text-green-400 mb-1">✔ Deployment Successful.</div>
+                        <div class="text-[#c9d1d9]">Model: <strong class="text-white">cl_unimodal_v2</strong></div>
+                        <div class="text-[#c9d1d9]">Target: <span class="text-purple-400">inferno-batch</span> namespace</div>
+                        <div class="mt-2 bg-[#161b22] p-3 rounded border border-[#30363d] font-mono text-xs text-[#8b949e]">
+                            Endpoint: https://inferno-internal.tempus.com/v1/models/mm-clinical-survival<br>
+                            Status: <span class="text-green-400">Healthy (2/2 Replicas)</span>
+                        </div>
+                    `
+                }
+            }
+        ];
+
+        // --- ENGINE ---
+        const state = { step: 0, isTyping: false, isThinking: false, typedText: "" };
+        const elements = {
+            history: document.getElementById('history'),
+            input: document.getElementById('terminal-input'),
+            ghost: document.getElementById('ghost-text'),
+            output: document.getElementById('terminal-output')
+        };
+
+        function startScenario() {
+            state.step = 0;
+            elements.history.innerHTML = '';
+            // Add start divider
+            const div = document.createElement('div');
+            div.className = "my-4 border-t border-dashed border-slate-700 pt-2 text-center text-xs text-slate-600";
+            div.innerText = `--- NEW SESSION: END-TO-END DEMO ---`;
+            elements.history.appendChild(div);
+            prepareStep();
+        }
+
+        function prepareStep() {
+            if (state.step >= endToEndScenario.length) {
+                state.targetText = "";
+                elements.input.value = "";
+                elements.ghost.textContent = "";
+
+                // End of Demo Message
+                const endDiv = document.createElement('div');
+                endDiv.className = "mt-8 text-center text-[#8b949e] text-xs animate-pulse";
+                endDiv.innerText = "[ END OF DEMO SCENARIO ]";
+                elements.history.appendChild(endDiv);
+                scrollToBottom();
+                return;
+            }
+            state.targetText = endToEndScenario[state.step].user;
+            state.typedText = "";
+            elements.input.value = "";
+            elements.ghost.textContent = "";
+            elements.input.focus();
+            scrollToBottom();
+        }
+
+        function scrollToBottom() {
+            elements.output.scrollTop = elements.output.scrollHeight;
+            requestAnimationFrame(() => {
+                elements.output.scrollTop = elements.output.scrollHeight;
+            });
+        }
+
+        function addEntry(type, content) {
+            const div = document.createElement('div');
+            div.className = "mb-6 animate-fade-in";
+
+            if (type === 'user') {
+                div.innerHTML = `
+                    <div class="flex items-start">
+                        <span class="text-green-400 font-bold mr-2 mt-0.5">❯</span>
+                        <div class="text-[#e6edf3] font-semibold">${content}</div>
+                    </div>
+                `;
+            } else if (type === 'ai') {
+                div.innerHTML = `
+                    <div class="flex items-start mt-2">
+                        <div class="text-purple-400 font-bold mr-3 mt-0.5 text-xs">GREMLIN</div>
+                        <div class="flex-grow text-[#c9d1d9] leading-relaxed text-sm">${content}</div>
+                    </div>
+                `;
+            } else if (type === 'think') {
+                div.id = "thinking";
+                div.innerHTML = `
+                    <div class="flex items-center text-slate-500 text-xs ml-9 animate-pulse font-mono">
+                        <i class="fa-solid fa-microchip mr-2"></i> ${content}
+                    </div>
+                `;
+            }
+            elements.history.appendChild(div);
+            scrollToBottom();
+            return div;
+        }
+
+        function submit() {
+            if (state.step >= endToEndScenario.length) return;
+
+            const text = elements.input.value;
+            if (!text.trim()) return;
+
+            addEntry('user', text);
+            elements.input.value = "";
+            elements.ghost.textContent = "";
+            state.typedText = "";
+
+            state.isThinking = true;
+            const scenario = endToEndScenario[state.step];
+            const thinkEl = addEntry('think', scenario.ai.think);
+
+            setTimeout(() => {
+                // Transform Thinking into a Persistent Log Entry
+                thinkEl.innerHTML = `
+                    <div class="flex items-center text-slate-600 text-xs ml-9 font-mono">
+                        <span class="text-green-500 mr-2">[LOG]</span> ${scenario.ai.think.replace('...', '')} ... <span class="text-green-500 ml-1">DONE</span>
+                    </div>
+                `;
+                thinkEl.id = ""; // Stop being the "active" thinking element
+                thinkEl.classList.remove("animate-pulse"); // Stop pulsing
+
+                // Add the actual AI response
+                addEntry('ai', scenario.ai.response);
+
+                state.isThinking = false;
+                state.step++;
+                prepareStep();
+            }, 1200);
+        }
+
+        // Magic Typing Handler
+        elements.input.addEventListener('keydown', (e) => {
+            if (state.isThinking || state.step >= endToEndScenario.length) {
+                e.preventDefault();
+                return;
+            }
+
+            // Tab Autocomplete
+            if (e.key === 'Tab') {
+                e.preventDefault();
+                if (state.typedText.length < state.targetText.length) {
+                    state.typedText = state.targetText;
+                    elements.input.value = state.typedText;
+                    elements.ghost.textContent = state.typedText;
+                    scrollToBottom();
+                }
+                return;
+            }
+
+            if (e.key === 'Enter') {
+                if (state.typedText.length < state.targetText.length) {
+                    state.typedText = state.targetText;
+                    elements.input.value = state.typedText;
+                    elements.ghost.textContent = state.typedText;
+                } else {
+                    submit();
+                }
+                e.preventDefault();
+            } else if (e.key === 'Backspace') {
+                state.typedText = state.typedText.slice(0, -1);
+                e.preventDefault();
+            } else if (!e.ctrlKey && !e.metaKey && !e.altKey && e.key.length === 1) {
+                e.preventDefault();
+                const nextChar = state.targetText[state.typedText.length];
+                if (nextChar) state.typedText += nextChar;
+            }
+
+            elements.input.value = state.typedText;
+            elements.ghost.textContent = state.typedText;
+            scrollToBottom();
+        });
+
+        // Focus Handling
+        document.getElementById('terminal-output').addEventListener('click', () => elements.input.focus());
+
+        // Init
+        startScenario();
+
+        function scrollToBottom() {
+            elements.output.scrollTop = elements.output.scrollHeight;
+            requestAnimationFrame(() => {
+                elements.output.scrollTop = elements.output.scrollHeight;
+            });
+        }
+
+    </script>
+</body>
+
+</html>
