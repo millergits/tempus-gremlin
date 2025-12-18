@@ -61,3 +61,13 @@ See **[workflows/README.md](workflows/README.md)** for the complete guide includ
 3. Test locally: `./open-demos.sh`
 
 4. Deploy: `./deploy_demo.sh` - automatically discovers and obfuscates all workflow files.
+
+## Critical Deployment Rules
+
+> [!IMPORTANT]
+> **ALWAYS** use the permanent domain: `7d3389c1-8dd1-4480-87d9-c36b9e04fc54.surge.sh`
+
+*   **NEVER** generate a new random domain.
+*   The `.domain` file must always contain this exact GUID.
+*   The `mockup.html` file must hardcode `DEPLOY_URL` to this exact domain.
+*   If deployment fails due to permissions, it means the user needs to switch to the `michael.miller@egen.ai` surge account.

@@ -71,6 +71,11 @@ if [ -f "gremlin-cli-mockup.js" ]; then
     cp gremlin-cli-mockup.js dist/
 fi
 
+# Copy assets directory
+if [ -d "assets" ]; then
+    cp -r assets dist/
+fi
+
 echo "🚀 Deploying to: $DEPLOY_DOMAIN"
 npx surge dist --domain "$DEPLOY_DOMAIN"
 

@@ -50,5 +50,22 @@ npx surge teardown [your-domain.surge.sh]
 ```
 
 ## Surge Credentials (Reference)
-*   **Email**: `accounts@itmiller.com`
+*   **URL (Permanent):** `https://7d3389c1-8dd1-4480-87d9-c36b9e04fc54.surge.sh`
+*   **Email**: `michael.miller@egen.ai`
+*   **Secondary Account**: `accounts@itmiller.com` (Same password hint)
 *   **Password Hint**: "standard + W"
+
+## Account Management
+
+### Remove a Site
+To permanently delete a specific deployment:
+```bash
+npx surge teardown [your-domain.surge.sh]
+```
+
+### Delete Account
+To **permanently delete your entire Surge account** and all deployed sites:
+```bash
+npx surge nuke
+```
+*Note: You must be logged in as the account you wish to delete.*
