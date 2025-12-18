@@ -69,3 +69,18 @@ To **permanently delete your entire Surge account** and all deployed sites:
 npx surge nuke
 ```
 *Note: You must be logged in as the account you wish to delete.*
+
+## Git Authentication (Troubleshooting)
+
+If you encounter the error `Password authentication is not supported for Git operations`, you need to use a **Personal Access Token (PAT)** instead of your account password.
+
+### How to Fix
+1.  Go to **GitHub Settings** -> **Developer Settings** -> **Personal Access Tokens** -> **Tokens (classic)**.
+2.  Click **Generate new token (classic)**.
+3.  Select the `repo` scope (full control of private repositories).
+4.  copy the generated token (begins with `ghp_...`).
+5.  In your terminal, run the push command again:
+    ```bash
+    git push origin main
+    ```
+6.  When asked for your **Password**, paste the **Token** you just copied.
