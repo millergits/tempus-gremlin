@@ -46,8 +46,15 @@
         }
 
         @keyframes blink {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0; }
+
+            0%,
+            100% {
+                opacity: 1;
+            }
+
+            50% {
+                opacity: 0;
+            }
         }
 
         /* Tables */
@@ -71,9 +78,17 @@
         }
 
         /* Diff Colors */
-        .diff-add { color: #4ade80; }
-        .diff-remove { color: #fdaeb7; }
-        .diff-header { color: #8b949e; }
+        .diff-add {
+            color: #4ade80;
+        }
+
+        .diff-remove {
+            color: #fdaeb7;
+        }
+
+        .diff-header {
+            color: #8b949e;
+        }
 
         /* Scanline */
         .scanline {
@@ -153,7 +168,8 @@
     <div class="scanline"></div>
 
     <!-- Terminal Window -->
-    <div class="bg-[#0d1117] border border-[#30363d] rounded-lg shadow-2xl flex flex-col overflow-hidden relative w-full max-w-5xl h-[85vh]">
+    <div
+        class="bg-[#0d1117] border border-[#30363d] rounded-lg shadow-2xl flex flex-col overflow-hidden relative w-full max-w-5xl h-[85vh]">
 
         <!-- Title Bar -->
         <div class="bg-[#010409] px-4 py-2 flex items-center justify-between border-b border-[#30363d]">
@@ -194,7 +210,8 @@
 | |  _| |_) |  _| | |\/| | |    | ||  \| |
 | |_| |  _ <| |___| |  | | |___ | || |\  |
  \____|_| \_\_____|_|  |_|_____|___|_| \_|</pre>
-                    <div class="text-[#8b949e] mt-3 mb-1">Tempus Gremlin CLI <span class="text-green-400">v2.4</span></div>
+                    <div class="text-[#8b949e] mt-3 mb-1">Tempus Gremlin CLI <span class="text-green-400">v2.4</span>
+                    </div>
                     <div class="text-[#c9d1d9] text-[11px] uppercase tracking-wide font-semibold">
                         <span class="gremlin-green">G</span>ENERATIVE
                         <span class="gremlin-green">R</span>ESEARCH
@@ -211,26 +228,26 @@
             <div id="history"></div>
 
             <!-- Input Line -->
-            <div class="flex items-center mt-4 pb-2" id="input-line">
+            <div class="flex items-start mt-4 pb-2" id="input-line">
                 <span class="text-green-400 font-bold mr-2">gremlin ></span>
                 <div class="relative flex-grow">
-                    <input type="text" id="terminal-input"
-                        class="w-full bg-transparent border-none outline-none text-[#e6edf3] font-mono caret-transparent"
+                    <span id="typed-display" class="text-[#e6edf3] whitespace-pre-wrap break-words font-mono"></span>
+                    <span class="cursor"></span>
+                    <input type="text" id="terminal-input" class="absolute inset-0 w-full opacity-0 cursor-none"
                         autocomplete="off" spellcheck="false" autofocus>
-                    <div id="ghost-text"
-                        class="absolute top-0 left-0 pointer-events-none text-[#e6edf3] opacity-50 whitespace-pre-wrap">
-                    </div>
                 </div>
-                <span class="cursor"></span>
             </div>
         </div>
     </div>
 
     <!-- PRO TIP BADGE -->
     <div class="fixed bottom-8 left-1/2 -translate-x-1/2 z-50 pointer-events-none opacity-70">
-        <div class="bg-[#0d1117]/90 text-[#8b949e] text-xs px-4 py-2 rounded-full border border-[#30363d] shadow-2xl backdrop-blur-md flex items-center gap-2">
+        <div
+            class="bg-[#0d1117]/90 text-[#8b949e] text-xs px-4 py-2 rounded-full border border-[#30363d] shadow-2xl backdrop-blur-md flex items-center gap-2">
             <i class="fa-solid fa-terminal text-green-500"></i>
-            <span>Pro Tip: Press <span class="text-green-400 font-bold font-mono bg-[#30363d] px-1.5 rounded mx-1">TAB</span> to auto-complete commands</span>
+            <span>Pro Tip: Press <span
+                    class="text-green-400 font-bold font-mono bg-[#30363d] px-1.5 rounded mx-1">TAB</span> to
+                auto-complete commands</span>
         </div>
     </div>
 
@@ -578,7 +595,7 @@
         const elements = {
             history: document.getElementById('history'),
             input: document.getElementById('terminal-input'),
-            ghost: document.getElementById('ghost-text'),
+            display: document.getElementById('typed-display'),
             output: document.getElementById('terminal-output')
         };
 
@@ -596,7 +613,7 @@
             if (state.step >= endToEndScenario.length) {
                 state.targetText = "";
                 elements.input.value = "";
-                elements.ghost.textContent = "";
+                elements.display.textContent = "";
 
                 const endDiv = document.createElement('div');
                 endDiv.className = "mt-8 text-center text-[#8b949e] text-xs animate-pulse";
@@ -609,7 +626,7 @@
             state.targetText = endToEndScenario[state.step].user;
             state.typedText = "";
             elements.input.value = "";
-            elements.ghost.textContent = "";
+            elements.display.textContent = "";
             elements.input.focus();
             scrollToBottom();
         }
@@ -660,7 +677,7 @@
 
             addEntry('user', text);
             elements.input.value = "";
-            elements.ghost.textContent = "";
+            elements.display.textContent = "";
             state.typedText = "";
 
             state.isThinking = true;
@@ -698,7 +715,7 @@
                 if (state.typedText.length < state.targetText.length) {
                     state.typedText = state.targetText;
                     elements.input.value = state.typedText;
-                    elements.ghost.textContent = state.typedText;
+                    elements.display.textContent = state.typedText;
                     scrollToBottom();
                 }
                 return;
@@ -707,7 +724,7 @@
             if (e.key === 'Enter') {
                 state.typedText = state.targetText;
                 elements.input.value = state.typedText;
-                elements.ghost.textContent = state.typedText;
+                elements.display.textContent = state.typedText;
                 submit();
                 e.preventDefault();
             } else if (e.key === 'Backspace') {
@@ -720,7 +737,7 @@
             }
 
             elements.input.value = state.typedText;
-            elements.ghost.textContent = state.typedText;
+            elements.display.textContent = state.typedText;
             scrollToBottom();
         });
 

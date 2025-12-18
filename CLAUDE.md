@@ -5,8 +5,12 @@
 When the user says "build" or asks to "build the mockup", execute the following script:
 
 ```bash
-./build_mockup.sh
+./build_mockup.sh [major|minor|patch]
 ```
+
+*   **Default**: Increments the **patch** version (e.g., `v2.4.0` -> `v2.4.1`).
+*   **Arguments**: Pass `minor` or `major` to increment those segments instead.
+*   The script automatically updates `mockup.html` before building.
 
 ## Open Mockup Command
 

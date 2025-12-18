@@ -808,7 +808,8 @@
 
         .completion-icon {
             font-size: 56px;
-            margin-bottom: 16px;
+            margin-bottom: 0px;
+            /* Reduced from 8px */
         }
 
         .completion-title {
@@ -913,7 +914,7 @@
         <div class="nav-brand">
             <span class="nav-brand-icon">&#9881;</span>
             <span class="nav-brand-text">GREMLIN MOCKUP</span>
-            <span class="version-badge">v2.4.0</span>
+            <span class="version-badge">v2.4.6</span>
         </div>
 
         <div class="nav-controls">
@@ -1120,7 +1121,10 @@
     <!-- Completion Modal -->
     <div class="completion-modal-overlay" id="completion-modal">
         <div class="completion-modal">
-            <div class="completion-icon">🎉</div>
+            <div class="completion-icon">
+                <img src="assets/gizmo-logo.png" alt="Gremlin"
+                    style="height: 85px; filter: drop-shadow(0 0 12px rgba(74, 222, 128, 0.4));">
+            </div>
             <div class="completion-title">Workflow Complete!</div>
             <div class="completion-workflow-name" id="completed-workflow-name">Onboarding Journey</div>
 
@@ -1246,6 +1250,7 @@
 
         // Track completed workflows in this session
         const completedWorkflows = new Set();
+        let workflowCompletePending = false;
 
         // Populate dropdown
         function populateWorkflows() {
@@ -1282,6 +1287,9 @@
 
         // Load a workflow
         function loadWorkflow(workflowId) {
+            // Reset pending state on navigation
+            workflowCompletePending = false;
+
             const workflow = WORKFLOWS.find(w => w.id === workflowId);
             if (!workflow) return;
 
@@ -1303,6 +1311,7 @@
         // Handle iframe load
         cliIframe.addEventListener('load', () => {
             cliLoading.classList.remove('active');
+            attachCliInteractionListener();
         });
 
         walkthroughIframe.addEventListener('load', () => {
@@ -1330,9 +1339,30 @@
 
             // Handle workflow completion from CLI iframe
             if (event.data && event.data.type === 'workflowComplete') {
-                showCompletionModal();
+                // Track completion immediately
+                completedWorkflows.add(select.value);
+
+                // Set pending state so next user interaction triggers modal
+                workflowCompletePending = true;
             }
         });
+
+        // Listen for keydown in the CLI iframe to trigger completion modal
+        function attachCliInteractionListener() {
+            try {
+                const iframeDoc = cliIframe.contentDocument || cliIframe.contentWindow.document;
+                iframeDoc.addEventListener('keydown', (e) => {
+                    if (workflowCompletePending) {
+                        e.preventDefault(); // Prevent typing the character
+                        e.stopPropagation();
+                        showCompletionModal();
+                        workflowCompletePending = false;
+                    }
+                });
+            } catch (e) {
+                console.log('Cannot attach listener to iframe (cross-origin limitation)');
+            }
+        }
 
         // Keyboard navigation
         document.addEventListener('keydown', (e) => {
@@ -1369,6 +1399,13 @@
 
         welcomeStartBtn.addEventListener('click', closeWelcomeModal);
 
+        // Close welcome modal on overlay click
+        welcomeModal.addEventListener('click', (e) => {
+            if (e.target === welcomeModal) {
+                closeWelcomeModal();
+            }
+        });
+
         // Initialize
         function init() {
             populateWorkflows();
@@ -1399,9 +1436,6 @@
         function showCompletionModal() {
             const currentWorkflow = WORKFLOWS.find(w => w.id === select.value);
             const currentIndex = WORKFLOWS.findIndex(w => w.id === select.value);
-
-            // Track this workflow as completed
-            completedWorkflows.add(select.value);
 
             // Update modal content
             completedWorkflowName.textContent = currentWorkflow.name;

@@ -183,17 +183,14 @@
             <div id="history"></div>
 
             <!-- Input Line -->
-            <div class="flex items-center mt-4 pb-2" id="input-line">
+            <div class="flex items-start mt-4 pb-2" id="input-line">
                 <span class="text-green-400 font-bold mr-2">gremlin ></span>
                 <div class="relative flex-grow">
-                    <input type="text" id="terminal-input"
-                        class="w-full bg-transparent border-none outline-none text-[#e6edf3] font-mono caret-transparent"
+                    <span id="typed-display" class="text-[#e6edf3] whitespace-pre-wrap break-words font-mono"></span>
+                    <span class="cursor"></span>
+                    <input type="text" id="terminal-input" class="absolute inset-0 w-full opacity-0 cursor-none"
                         autocomplete="off" spellcheck="false" autofocus>
-                    <div id="ghost-text"
-                        class="absolute top-0 left-0 pointer-events-none text-[#e6edf3] opacity-50 whitespace-pre-wrap">
-                    </div>
                 </div>
-                <span class="cursor"></span>
             </div>
         </div>
     </div>
@@ -366,7 +363,7 @@
         const elements = {
             history: document.getElementById('history'),
             input: document.getElementById('terminal-input'),
-            ghost: document.getElementById('ghost-text'),
+            display: document.getElementById('typed-display'),
             output: document.getElementById('terminal-output')
         };
 
@@ -385,7 +382,7 @@
             if (state.step >= endToEndScenario.length) {
                 state.targetText = "";
                 elements.input.value = "";
-                elements.ghost.textContent = "";
+                elements.display.textContent = "";
 
                 // End of Demo Message
                 const endDiv = document.createElement('div');
@@ -401,7 +398,7 @@
             state.targetText = endToEndScenario[state.step].user;
             state.typedText = "";
             elements.input.value = "";
-            elements.ghost.textContent = "";
+            elements.display.textContent = "";
             elements.input.focus();
             scrollToBottom();
         }
@@ -452,7 +449,7 @@
 
             addEntry('user', text);
             elements.input.value = "";
-            elements.ghost.textContent = "";
+            elements.display.textContent = "";
             state.typedText = "";
 
             state.isThinking = true;
@@ -495,7 +492,7 @@
                 if (state.typedText.length < state.targetText.length) {
                     state.typedText = state.targetText;
                     elements.input.value = state.typedText;
-                    elements.ghost.textContent = state.typedText;
+                    elements.display.textContent = state.typedText;
                     scrollToBottom();
                 }
                 return;
@@ -505,7 +502,7 @@
                 // Ensure text is filled before submitting
                 state.typedText = state.targetText;
                 elements.input.value = state.typedText;
-                elements.ghost.textContent = state.typedText;
+                elements.display.textContent = state.typedText;
 
                 // Submit immediately
                 submit();
@@ -520,7 +517,7 @@
             }
 
             elements.input.value = state.typedText;
-            elements.ghost.textContent = state.typedText;
+            elements.display.textContent = state.typedText;
             scrollToBottom();
         });
 

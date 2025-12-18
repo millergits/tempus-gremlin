@@ -8,6 +8,43 @@ rm -rf dist
 mkdir -p dist
 mkdir -p dist/workflows
 
+# Handle Version Bump
+# Grep specifically for the HTML tag to avoid matching CSS definitions
+VERSION_LINE=$(grep 'class="version-badge">v' mockup.html)
+
+if [ -z "$VERSION_LINE" ]; then
+    echo "⚠️  Warning: Could not find version badge in mockup.html. Skipping version bump."
+else
+    # Extract version number (e.g. 2.4.0)
+    CURRENT_VERSION=$(echo "$VERSION_LINE" | sed -E 's/.*class="version-badge">v([0-9]+\.[0-9]+\.[0-9]+)<.*/\1/')
+    IFS='.' read -r MAJ MIN PAT <<< "$CURRENT_VERSION"
+
+    # Determine increment type (default to patch)
+    BUMP_TYPE="patch"
+    if [[ "$1" == "major" ]]; then
+        BUMP_TYPE="major"
+    elif [[ "$1" == "minor" ]]; then
+        BUMP_TYPE="minor"
+    fi
+
+    if [[ "$BUMP_TYPE" == "major" ]]; then
+        MAJ=$((MAJ + 1))
+        MIN=0
+        PAT=0
+    elif [[ "$BUMP_TYPE" == "minor" ]]; then
+        MIN=$((MIN + 1))
+        PAT=0
+    else
+        PAT=$((PAT + 1))
+    fi
+
+    NEW_VERSION="${MAJ}.${MIN}.${PAT}"
+    echo "🔖 Bumping version: v$CURRENT_VERSION -> v$NEW_VERSION"
+
+    # Update mockup.html using precise match
+    sed -i '' "s/class=\"version-badge\">v$CURRENT_VERSION</class=\"version-badge\">v$NEW_VERSION</" mockup.html
+fi
+
 # Handle Domain persistence (do this first so we can inject it into the HTML)
 DOMAIN_FILE=".domain"
 
