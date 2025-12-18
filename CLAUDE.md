@@ -1,28 +1,36 @@
 # Tempus Gremlin Project Instructions
 
-## Demo Command
+## Build Command
 
-When the user says "demo" or asks to "open the demo" or "run the demo", execute the following script:
+When the user says "build" or asks to "build the mockup", execute the following script:
 
 ```bash
-./open-demos.sh
+./build_mockup.sh
 ```
 
-This opens `demo.html` which shows a navigation bar with workflow selection and both panels side by side:
-- Left: Interactive CLI Demo
+## Open Mockup Command
+
+When the user says "mockup", "open mockup", "demo", or asks to "open the demo/mockup", execute the following script:
+
+```bash
+./open-mockup.sh
+```
+
+This opens `mockup.html` which shows a navigation bar with workflow selection and both panels side by side:
+- Left: Interactive CLI Mockup
 - Right: Walkthrough Guide
 
 ## Project Structure
 
 ```
 tempus-gremlin/
-├── demo.html                    # Main demo UI with workflow navigation
+├── mockup.html                  # Main mockup UI with workflow navigation
 ├── workflows/                   # Workflow files (cli + walkthrough pairs)
-│   ├── mm-fusion-cli.html       # Multiple Myeloma Fusion - CLI demo
+│   ├── mm-fusion-cli.html       # Multiple Myeloma Fusion - CLI mockup
 │   └── mm-fusion-walkthrough.html  # Multiple Myeloma Fusion - Walkthrough
-├── gremlin-cli-demo.js          # Terminal-based interactive CLI demo (run with `node gremlin-cli-demo.js`)
-├── deploy_demo.sh               # Deployment script (handles obfuscation + surge)
-└── open-demos.sh                # Script to open demo locally
+├── gremlin-cli-mockup.js        # Terminal-based interactive CLI mockup (run with `node gremlin-cli-mockup.js`)
+├── build_mockup.sh            # Build/Deployment script (handles obfuscation + surge)
+└── open-mockup.sh               # Script to open mockup locally
 ```
 
 ## Adding New Workflows

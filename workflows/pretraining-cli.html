@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gremlin CLI - Pretraining</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;600&family=Inter:wght@400;600&display=swap');
+        body { background-color: #050505; color: #c9d1d9; overflow: hidden; font-family: 'Fira Code', monospace; }
+        .terminal-scroll::-webkit-scrollbar { width: 8px; }
+        .terminal-scroll::-webkit-scrollbar-track { background: #0d1117; }
+        .terminal-scroll::-webkit-scrollbar-thumb { background: #30363d; border-radius: 4px; }
+        .cursor { display: inline-block; width: 10px; height: 1.2em; background-color: #4ade80; animation: blink 1s step-end infinite; vertical-align: text-bottom; }
+        @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
+        .term-table { width: 100%; border-collapse: collapse; margin: 1rem 0; font-size: 0.9rem; }
+        .term-table th { text-align: left; border-bottom: 1px solid #30363d; color: #8b949e; padding: 0.5rem; }
+        .term-table td { padding: 0.5rem; border-bottom: 1px solid #21262d; }
+        .diff-add { color: #4ade80; }
+        .scanline { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(to bottom, rgba(255, 255, 255, 0), rgba(255, 255, 255, 0) 50%, rgba(0, 0, 0, 0.02) 50%, rgba(0, 0, 0, 0.02)); background-size: 100% 4px; pointer-events: none; z-index: 10; }
+        .gremlin-green { color: #4ade80; text-shadow: 0 0 10px rgba(74, 222, 128, 0.3); }
+        .ascii-art { font-weight: bold; line-height: 1.1; }
+        .code-block { background: #161b22; border: 1px solid #30363d; border-radius: 6px; padding: 1rem; font-family: monospace; font-size: 0.85rem; margin: 0.5rem 0; overflow-x: auto; }
+        .progress-bar { background: #21262d; border-radius: 4px; height: 8px; overflow: hidden; }
+        .progress-fill { background: linear-gradient(90deg, #238636, #4ade80); height: 100%; transition: width 0.5s; }
+    </style>
+</head>
+
+<body class="h-screen w-screen flex flex-col p-4 md:p-8 selection:bg-green-500/30 justify-center items-center">
+
+    <div class="scanline"></div>
+
+    <div class="bg-[#0d1117] border border-[#30363d] rounded-lg shadow-2xl flex flex-col overflow-hidden relative w-full max-w-5xl h-[85vh]">
+
+        <div class="bg-[#010409] px-4 py-2 flex items-center justify-between border-b border-[#30363d]">
+            <div class="flex space-x-2">
+                <div class="w-3 h-3 rounded-full bg-[#ff5f56]"></div>
+                <div class="w-3 h-3 rounded-full bg-[#ffbd2e]"></div>
+                <div class="w-3 h-3 rounded-full bg-[#27c93f]"></div>
+            </div>
+            <div class="text-xs text-[#8b949e] font-semibold flex items-center">
+                <i class="fa-solid fa-shield-halved mr-2 text-green-500"></i> scientist@tempus-cluster-01
+            </div>
+            <div class="w-12"></div>
+        </div>
+
+        <div id="terminal-output" class="flex-grow p-6 overflow-y-auto terminal-scroll text-sm md:text-base font-mono">
+
+            <div class="mb-8 animate-fade-in flex items-start space-x-6 border-b border-[#30363d] pb-6">
+                <pre class="gremlin-green text-[10px] md:text-[12px] leading-none block">
+         ,           ,
+        / \         / \
+       /   \       /   \
+      /     \     /     \
+     (       \___/       )
+      \   O         O   /
+       \       ^       /
+        \    _____    /
+         \__/     \__/
+                </pre>
+                <div>
+                    <pre class="ascii-art gremlin-green text-[10px] md:text-xs leading-[1.1]">
+  ____ ____  _____ __  __ _     ___ _   _
+ / ___|  _ \| ____|  \/  | |   |_ _| \ | |
+| |  _| |_) |  _| | |\/| | |    | ||  \| |
+| |_| |  _ <| |___| |  | | |___ | || |\  |
+ \____|_| \_\_____|_|  |_|_____|___|_| \_|</pre>
+                    <div class="text-[#8b949e] mt-3 mb-1">Tempus Gremlin CLI <span class="text-green-400">v2.4</span></div>
+                    <div class="text-[#c9d1d9] text-[11px] uppercase tracking-wide font-semibold">
+                        <span class="gremlin-green">G</span>ENERATIVE <span class="gremlin-green">R</span>ESEARCH <span class="gremlin-green">E</span>NGINE FOR <span class="gremlin-green">M</span>ACHINE <span class="gremlin-green">L</span>EARNING <span class="gremlin-green">I</span>NFRASTRUCTURE & <span class="gremlin-green">N</span>AVIGATION
+                    </div>
+                </div>
+            </div>
+
+            <div id="history"></div>
+
+            <div class="flex items-center mt-4 pb-2" id="input-line">
+                <span class="text-green-400 font-bold mr-2">gremlin ></span>
+                <div class="relative flex-grow">
+                    <input type="text" id="terminal-input" class="w-full bg-transparent border-none outline-none text-[#e6edf3] font-mono caret-transparent" autocomplete="off" spellcheck="false" autofocus>
+                    <div id="ghost-text" class="absolute top-0 left-0 pointer-events-none text-[#e6edf3] opacity-50 whitespace-pre-wrap"></div>
+                </div>
+                <span class="cursor"></span>
+            </div>
+        </div>
+    </div>
+
+    <div class="fixed bottom-8 left-1/2 -translate-x-1/2 z-50 pointer-events-none opacity-70">
+        <div class="bg-[#0d1117]/90 text-[#8b949e] text-xs px-4 py-2 rounded-full border border-[#30363d] shadow-2xl backdrop-blur-md flex items-center gap-2">
+            <i class="fa-solid fa-terminal text-green-500"></i>
+            <span>Pro Tip: Press <span class="text-green-400 font-bold font-mono bg-[#30363d] px-1.5 rounded mx-1">TAB</span> to auto-complete commands</span>
+        </div>
+    </div>
+
+    <script>
+        const endToEndScenario = [
+            {
+                user: "I need to pretrain a BERT model on the 'pathology-reports-2024' corpus. Prepare the data for 128 nodes.",
+                ai: {
+                    think: "Analyzing 'pathology-reports-2024' corpus... Calculating optimal sharding strategy...",
+                    response: `
+                        <div class="text-green-400 font-bold mb-3">DATA PREPARATION ANALYSIS</div>
+
+                        <div class="text-[#c9d1d9] mb-3">Analyzing <code class="text-purple-400">pathology-reports-2024</code> (Size: <span class="text-green-400">10.2 TB</span>)</div>
+
+                        <table class="term-table" style="width: 70%">
+                            <tbody>
+                                <tr><td>Corpus Size</td><td class="text-green-400 font-bold">10.2 TB</td></tr>
+                                <tr><td>Documents</td><td>4.2M pathology reports</td></tr>
+                                <tr><td>Target Nodes</td><td>128 A100 GPUs</td></tr>
+                            </tbody>
+                        </table>
+
+                        <div class="text-[#c9d1d9] mb-2 mt-4"><strong>Optimal Sharding Strategy:</strong></div>
+                        <div class="code-block text-xs">
+Target Batch: 4096
+Optimal Shards: 256
+Streaming Buffer: 50GB
+Tokenizer: WordPiece (30K vocab)
+                        </div>
+
+                        <div class="text-[#c9d1d9] mt-4">Launch Ray Data job to tokenize and shard? <span class="text-green-400">[Y/n]</span></div>
+                    `
+                }
+            },
+            {
+                user: "Y",
+                ai: {
+                    think: "Submitting Ray Data job... Initializing 256 workers...",
+                    response: `
+                        <div class="text-green-400 mb-2">✔ Job <code class="text-purple-400">data-prep-bert-v1</code> submitted.</div>
+
+                        <div class="text-[#8b949e] text-sm mb-3">
+                            [INFO] Spinning up Ray Data cluster (256 workers)...<br>
+                            [INFO] Tokenizing documents in parallel...<br>
+                            [INFO] Writing shards to GCS...
+                        </div>
+
+                        <div class="mb-3">
+                            <div class="text-[#8b949e] text-xs mb-1">Progress: 100%</div>
+                            <div class="progress-bar"><div class="progress-fill" style="width: 100%"></div></div>
+                        </div>
+
+                        <div class="text-[#c9d1d9]">
+                            <span class="text-green-400 font-bold">✔ Data preparation complete</span> (Time: 4h 12m)<br>
+                            Dataset pinned: <code class="text-purple-400">atlas://datasets/path_bert_pretrain_v1</code>
+                        </div>
+
+                        <table class="term-table" style="width: 60%">
+                            <tbody>
+                                <tr><td>Shards Created</td><td class="text-green-400">256</td></tr>
+                                <tr><td>Total Tokens</td><td class="text-green-400">2.6T</td></tr>
+                                <tr><td>Avg Shard Size</td><td>40GB</td></tr>
+                            </tbody>
+                        </table>
+                    `
+                }
+            },
+            {
+                user: "Train 'path-bert-large' on this data. Use Spot instances to save cost. Enable auto-recovery.",
+                ai: {
+                    think: "Generating config with fault-tolerance settings... Calculating cost estimate...",
+                    response: `
+                        <div class="text-green-400 font-bold mb-3">TRAINING CONFIGURATION</div>
+
+                        <div class="text-[#c9d1d9] mb-2"><strong>Resilience Settings:</strong></div>
+                        <div class="code-block text-xs">
+use_spot: <span class="text-green-400">true</span>
+max_retries: <span class="text-green-400">-1</span>  <span class="text-[#8b949e]"># Infinite</span>
+checkpoint_freq: <span class="text-green-400">500</span> steps
+elastic_training: <span class="text-green-400">enabled</span>
+                        </div>
+
+                        <div class="text-[#c9d1d9] mt-4 mb-2"><strong>Cost Analysis:</strong></div>
+                        <table class="term-table" style="width: 80%">
+                            <thead><tr><th>Option</th><th>Cost</th><th>Savings</th></tr></thead>
+                            <tbody>
+                                <tr><td>On-Demand (128 A100s)</td><td class="text-red-400">$50,000</td><td>-</td></tr>
+                                <tr class="bg-[#21262d]"><td><strong>Spot + Auto-Recovery</strong></td><td class="text-green-400 font-bold">$14,200</td><td class="text-green-400">$35,800 (72%)</td></tr>
+                            </tbody>
+                        </table>
+
+                        <div class="border-l-2 border-green-500 pl-3 mt-4 text-sm">
+                            <div class="text-green-400 mb-1">Spot Strategy:</div>
+                            <div class="text-[#c9d1d9]">If a node is preempted, GREMLIN will automatically pause training, acquire a replacement, resync weights, and resume from the last checkpoint.</div>
+                        </div>
+
+                        <div class="text-[#c9d1d9] mt-4">Submit training job with Spot instances? <span class="text-green-400">[Y/n]</span></div>
+                    `
+                }
+            },
+            {
+                user: "Y",
+                ai: {
+                    think: "Submitting to Hypernexus via KubeRay... Acquiring 128 Spot GPUs...",
+                    response: `
+                        <div class="text-[#c9d1d9]">🚀 Training started on <span class="text-green-400">128 Spot GPUs</span>.</div>
+                        <div class="text-[#8b949e] text-sm mb-4">
+                            Job ID: <code class="text-purple-400">job-pretrain-bert-v1</code><br>
+                            Est. Duration: 2 weeks<br>
+                            Est. Cost: $14,200
+                        </div>
+
+                        <div class="border-l-2 border-yellow-500 pl-3 mb-4">
+                            <div class="text-yellow-400 font-bold text-sm mb-1">⚠️ ALERT: Node Preemption Event (Day 3 - 03:14 AM)</div>
+                            <div class="text-[#c9d1d9] text-sm">
+                                Node <code>gke-spot-42</code> was preempted by Google Cloud.
+                            </div>
+                        </div>
+
+                        <div class="text-[#8b949e] text-sm mb-4">
+                            🤖 <span class="text-green-400">AUTO-HANDLER:</span> Pausing training...<br>
+                            🤖 <span class="text-green-400">AUTO-HANDLER:</span> Requesting replacement node... <span class="text-green-400">[Acquired]</span><br>
+                            🤖 <span class="text-green-400">AUTO-HANDLER:</span> Resyncing weights from checkpoint...<br>
+                            🚀 <span class="text-green-400">AUTO-HANDLER:</span> Resumed at Step 145,000.
+                        </div>
+
+                        <div class="border-l-2 border-green-500 pl-3 text-sm">
+                            <span class="text-green-400 font-bold">No User Action Required</span><br>
+                            Training continues automatically. You'll be notified on completion.
+                        </div>
+                    `
+                }
+            },
+            {
+                user: "How is the pretraining run going?",
+                ai: {
+                    think: "Fetching metrics from Weights & Biases... Analyzing loss curve for anomalies...",
+                    response: `
+                        <div class="text-green-400 font-bold mb-3">RUN STATUS: job-pretrain-bert-v1</div>
+
+                        <table class="term-table" style="width: 80%">
+                            <thead><tr><th>Metric</th><th>Current</th><th>Trend</th></tr></thead>
+                            <tbody>
+                                <tr><td>Step</td><td>125,000 / 500,000</td><td><span class="text-[#8b949e]">25% complete</span></td></tr>
+                                <tr><td>Loss</td><td class="text-green-400 font-bold">2.14</td><td><span class="text-green-400">📉 Decreasing normally</span></td></tr>
+                                <tr><td>MFU</td><td class="text-green-400">48%</td><td><span class="text-green-400">✅ Excellent</span></td></tr>
+                                <tr><td>Tokens Seen</td><td>2.0B</td><td><span class="text-green-400">On track</span></td></tr>
+                                <tr><td>GPU Utilization</td><td>94% avg</td><td><span class="text-green-400">✅ Healthy</span></td></tr>
+                            </tbody>
+                        </table>
+
+                        <div class="mt-4 text-center">
+                            <span class="text-green-400 font-bold text-2xl">🟢 HEALTHY</span>
+                        </div>
+
+                        <div class="border-l-2 border-purple-500 pl-3 mt-4 text-sm">
+                            <div class="text-purple-400 font-bold mb-1">🧠 AI Insight:</div>
+                            <div class="text-[#c9d1d9]">
+                                Loss curve matches Chinchilla optimal scaling laws for this step.<br>
+                                No loss spikes detected in the last 24 hours.<br>
+                                Current trajectory projects final loss of ~1.85 (within expected range).
+                            </div>
+                        </div>
+
+                        <div class="text-[#8b949e] text-sm mt-4">
+                            Projected completion: <span class="text-green-400">Friday at 3:00 PM</span><br>
+                            Estimated remaining cost: $28,000
+                        </div>
+
+                        <div class="text-[#c9d1d9] mt-4">Set up alert thresholds for anomalies? <span class="text-green-400">[Y/n]</span></div>
+                    `
+                }
+            },
+            {
+                user: "Y",
+                ai: {
+                    think: "Configuring anomaly detection alerts...",
+                    response: `
+                        <div class="text-green-400 mb-3">✔ Alert thresholds configured.</div>
+
+                        <table class="term-table">
+                            <thead><tr><th>Check</th><th>Threshold</th><th>Action</th></tr></thead>
+                            <tbody>
+                                <tr><td>Loss Spike</td><td>> 2x moving average</td><td><span class="text-yellow-400">Slack alert</span></td></tr>
+                                <tr><td>GPU Memory</td><td>> 90% VRAM</td><td><span class="text-yellow-400">Warning log</span></td></tr>
+                                <tr><td>Training Stall</td><td>No progress for 10 min</td><td><span class="text-red-400">Slack alert</span></td></tr>
+                                <tr><td>MFU Drop</td><td>< 30% efficiency</td><td><span class="text-yellow-400">Investigation prompt</span></td></tr>
+                                <tr><td>Node Preemption</td><td>Any</td><td><span class="text-green-400">Auto-recovery</span></td></tr>
+                            </tbody>
+                        </table>
+
+                        <div class="text-[#8b949e] text-sm mt-4">
+                            Notification: Slack DM to @scientist<br>
+                            Monitoring: <span class="text-green-400 font-bold">ACTIVE</span>
+                        </div>
+
+                        <div class="border-l-2 border-green-500 pl-3 mt-4 text-sm">
+                            <span class="text-green-400">You'll be notified if anything needs attention.</span><br>
+                            Training will continue autonomously with auto-recovery enabled.
+                        </div>
+                    `
+                }
+            }
+        ];
+
+        const state = { step: 0, isTyping: false, isThinking: false, typedText: "" };
+        const elements = { history: document.getElementById('history'), input: document.getElementById('terminal-input'), ghost: document.getElementById('ghost-text'), output: document.getElementById('terminal-output') };
+
+        function startScenario() {
+            state.step = 0; elements.history.innerHTML = '';
+            const div = document.createElement('div');
+            div.className = "my-4 border-t border-dashed border-slate-700 pt-2 text-center text-xs text-slate-600";
+            div.innerText = `--- NEW SESSION: UNIMODAL PRETRAINING ---`;
+            elements.history.appendChild(div); prepareStep();
+        }
+
+        function prepareStep() {
+            if (state.step >= endToEndScenario.length) {
+                state.targetText = ""; elements.input.value = ""; elements.ghost.textContent = "";
+                const endDiv = document.createElement('div');
+                endDiv.className = "mt-8 text-center text-[#8b949e] text-xs animate-pulse";
+                endDiv.innerText = "[ END OF PRETRAINING DEMO ]";
+                elements.history.appendChild(endDiv); scrollToBottom();
+                window.parent.postMessage({ type: 'workflowComplete' }, '*');
+                return;
+            }
+            state.targetText = endToEndScenario[state.step].user;
+            state.typedText = ""; elements.input.value = ""; elements.ghost.textContent = "";
+            elements.input.focus(); scrollToBottom();
+        }
+
+        function scrollToBottom() { elements.output.scrollTop = elements.output.scrollHeight; requestAnimationFrame(() => { elements.output.scrollTop = elements.output.scrollHeight; }); }
+
+        function addEntry(type, content) {
+            const div = document.createElement('div'); div.className = "mb-6 animate-fade-in";
+            if (type === 'user') { div.innerHTML = `<div class="flex items-start"><span class="text-green-400 font-bold mr-2 mt-0.5">❯</span><div class="text-[#e6edf3] font-semibold">${content}</div></div>`; }
+            else if (type === 'ai') { div.innerHTML = `<div class="flex items-start mt-2"><div class="text-purple-400 font-bold mr-3 mt-0.5 text-xs">GREMLIN</div><div class="flex-grow text-[#c9d1d9] leading-relaxed text-sm">${content}</div></div>`; }
+            else if (type === 'think') { div.id = "thinking"; div.innerHTML = `<div class="flex items-center text-slate-500 text-xs ml-9 animate-pulse font-mono"><i class="fa-solid fa-microchip mr-2"></i> ${content}</div>`; }
+            elements.history.appendChild(div); scrollToBottom(); return div;
+        }
+
+        function submit() {
+            if (state.step >= endToEndScenario.length) return;
+            const text = elements.input.value; if (!text.trim()) return;
+            addEntry('user', text); elements.input.value = ""; elements.ghost.textContent = ""; state.typedText = "";
+            state.isThinking = true;
+            const scenario = endToEndScenario[state.step];
+            const thinkEl = addEntry('think', scenario.ai.think);
+            setTimeout(() => {
+                thinkEl.innerHTML = `<div class="flex items-center text-slate-600 text-xs ml-9 font-mono"><span class="text-green-500 mr-2">[LOG]</span> ${scenario.ai.think.replace('...', '')} ... <span class="text-green-500 ml-1">DONE</span></div>`;
+                thinkEl.id = ""; thinkEl.classList.remove("animate-pulse");
+                addEntry('ai', scenario.ai.response);
+                state.isThinking = false; state.step++;
+                window.parent.postMessage({ type: 'cliStepComplete', step: state.step }, '*');
+                prepareStep();
+            }, 1200);
+        }
+
+        elements.input.addEventListener('keydown', (e) => {
+            if (state.isThinking || state.step >= endToEndScenario.length) { e.preventDefault(); return; }
+            if (e.key === 'Tab') { e.preventDefault(); if (state.typedText.length < state.targetText.length) { state.typedText = state.targetText; elements.input.value = state.typedText; elements.ghost.textContent = state.typedText; scrollToBottom(); } return; }
+            if (e.key === 'Enter') { state.typedText = state.targetText; elements.input.value = state.typedText; elements.ghost.textContent = state.typedText; submit(); e.preventDefault(); }
+            else if (e.key === 'Backspace') { state.typedText = state.typedText.slice(0, -1); e.preventDefault(); }
+            else if (!e.ctrlKey && !e.metaKey && !e.altKey && e.key.length === 1) { e.preventDefault(); const nextChar = state.targetText[state.typedText.length]; if (nextChar) state.typedText += nextChar; }
+            elements.input.value = state.typedText; elements.ghost.textContent = state.typedText; scrollToBottom();
+        });
+
+        document.getElementById('terminal-output').addEventListener('click', () => elements.input.focus());
+        window.addEventListener('message', (event) => { if (event.data && event.data.type === 'resetWorkflow') { startScenario(); } });
+        startScenario();
+    </script>
+</body>
+
+</html>

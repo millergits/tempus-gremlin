@@ -1,0 +1,537 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gremlin CLI - Repository Discovery</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;600&family=Inter:wght@400;600&display=swap');
+
+        body {
+            background-color: #050505;
+            color: #c9d1d9;
+            overflow: hidden;
+            font-family: 'Fira Code', monospace;
+        }
+
+        .terminal-scroll::-webkit-scrollbar { width: 8px; }
+        .terminal-scroll::-webkit-scrollbar-track { background: #0d1117; }
+        .terminal-scroll::-webkit-scrollbar-thumb { background: #30363d; border-radius: 4px; }
+        .terminal-scroll::-webkit-scrollbar-thumb:hover { background: #484f58; }
+
+        .cursor {
+            display: inline-block;
+            width: 10px;
+            height: 1.2em;
+            background-color: #4ade80;
+            animation: blink 1s step-end infinite;
+            vertical-align: text-bottom;
+        }
+
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0; }
+        }
+
+        .term-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1rem 0;
+            font-size: 0.9rem;
+        }
+
+        .term-table th {
+            text-align: left;
+            border-bottom: 1px solid #30363d;
+            color: #8b949e;
+            padding: 0.5rem;
+        }
+
+        .term-table td {
+            padding: 0.5rem;
+            border-bottom: 1px solid #21262d;
+        }
+
+        .diff-add { color: #4ade80; }
+        .diff-remove { color: #fdaeb7; }
+        .diff-header { color: #8b949e; }
+
+        .scanline {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(to bottom, rgba(255, 255, 255, 0), rgba(255, 255, 255, 0) 50%, rgba(0, 0, 0, 0.02) 50%, rgba(0, 0, 0, 0.02));
+            background-size: 100% 4px;
+            pointer-events: none;
+            z-index: 10;
+        }
+
+        .gremlin-green {
+            color: #4ade80;
+            text-shadow: 0 0 10px rgba(74, 222, 128, 0.3);
+        }
+
+        .ascii-art {
+            font-weight: bold;
+            line-height: 1.1;
+        }
+
+        .code-block {
+            background: #161b22;
+            border: 1px solid #30363d;
+            border-radius: 6px;
+            padding: 1rem;
+            font-family: monospace;
+            font-size: 0.85rem;
+            margin: 0.5rem 0;
+            overflow-x: auto;
+        }
+
+        .file-path {
+            color: #58a6ff;
+            text-decoration: underline;
+            cursor: pointer;
+        }
+    </style>
+</head>
+
+<body class="h-screen w-screen flex flex-col p-4 md:p-8 selection:bg-green-500/30 justify-center items-center">
+
+    <div class="scanline"></div>
+
+    <div class="bg-[#0d1117] border border-[#30363d] rounded-lg shadow-2xl flex flex-col overflow-hidden relative w-full max-w-5xl h-[85vh]">
+
+        <div class="bg-[#010409] px-4 py-2 flex items-center justify-between border-b border-[#30363d]">
+            <div class="flex space-x-2">
+                <div class="w-3 h-3 rounded-full bg-[#ff5f56]"></div>
+                <div class="w-3 h-3 rounded-full bg-[#ffbd2e]"></div>
+                <div class="w-3 h-3 rounded-full bg-[#27c93f]"></div>
+            </div>
+            <div class="text-xs text-[#8b949e] font-semibold flex items-center">
+                <i class="fa-solid fa-shield-halved mr-2 text-green-500"></i> scientist@tempus-cluster-01
+            </div>
+            <div class="w-12"></div>
+        </div>
+
+        <div id="terminal-output" class="flex-grow p-6 overflow-y-auto terminal-scroll text-sm md:text-base font-mono">
+
+            <div class="mb-8 animate-fade-in flex items-start space-x-6 border-b border-[#30363d] pb-6">
+                <pre class="gremlin-green text-[10px] md:text-[12px] leading-none block">
+         ,           ,
+        / \         / \
+       /   \       /   \
+      /     \     /     \
+     (       \___/       )
+      \   O         O   /
+       \       ^       /
+        \    _____    /
+         \__/     \__/
+                </pre>
+
+                <div>
+                    <pre class="ascii-art gremlin-green text-[10px] md:text-xs leading-[1.1]">
+  ____ ____  _____ __  __ _     ___ _   _
+ / ___|  _ \| ____|  \/  | |   |_ _| \ | |
+| |  _| |_) |  _| | |\/| | |    | ||  \| |
+| |_| |  _ <| |___| |  | | |___ | || |\  |
+ \____|_| \_\_____|_|  |_|_____|___|_| \_|</pre>
+                    <div class="text-[#8b949e] mt-3 mb-1">Tempus Gremlin CLI <span class="text-green-400">v2.4</span></div>
+                    <div class="text-[#c9d1d9] text-[11px] uppercase tracking-wide font-semibold">
+                        <span class="gremlin-green">G</span>ENERATIVE
+                        <span class="gremlin-green">R</span>ESEARCH
+                        <span class="gremlin-green">E</span>NGINE FOR
+                        <span class="gremlin-green">M</span>ACHINE
+                        <span class="gremlin-green">L</span>EARNING
+                        <span class="gremlin-green">I</span>NFRASTRUCTURE &
+                        <span class="gremlin-green">N</span>AVIGATION
+                    </div>
+                </div>
+            </div>
+
+            <div id="history"></div>
+
+            <div class="flex items-center mt-4 pb-2" id="input-line">
+                <span class="text-green-400 font-bold mr-2">gremlin ></span>
+                <div class="relative flex-grow">
+                    <input type="text" id="terminal-input"
+                        class="w-full bg-transparent border-none outline-none text-[#e6edf3] font-mono caret-transparent"
+                        autocomplete="off" spellcheck="false" autofocus>
+                    <div id="ghost-text"
+                        class="absolute top-0 left-0 pointer-events-none text-[#e6edf3] opacity-50 whitespace-pre-wrap">
+                    </div>
+                </div>
+                <span class="cursor"></span>
+            </div>
+        </div>
+    </div>
+
+    <div class="fixed bottom-8 left-1/2 -translate-x-1/2 z-50 pointer-events-none opacity-70">
+        <div class="bg-[#0d1117]/90 text-[#8b949e] text-xs px-4 py-2 rounded-full border border-[#30363d] shadow-2xl backdrop-blur-md flex items-center gap-2">
+            <i class="fa-solid fa-terminal text-green-500"></i>
+            <span>Pro Tip: Press <span class="text-green-400 font-bold font-mono bg-[#30363d] px-1.5 rounded mx-1">TAB</span> to auto-complete commands</span>
+        </div>
+    </div>
+
+    <script>
+        const endToEndScenario = [
+            {
+                user: "Where is the tokenizer logic for the RNA BERT model?",
+                ai: {
+                    think: "Searching Knowledge Base (Scopes: molecular-models, unimodal-rna-model)...",
+                    response: `
+                        <div class="text-green-400 font-bold mb-3">ANSWER: RNA TOKENIZER LOGIC</div>
+                        <div class="text-[#c9d1d9] mb-3">The RNA tokenizer logic is located in <code class="text-purple-400">unimodal-rna-model</code>.</div>
+
+                        <div class="code-block">
+                            <div class="text-[#8b949e] text-xs mb-2">Key File:</div>
+                            <div class="file-path">unimodal_rna_model/data/tokenizer.py</div>
+                            <div class="text-[#8b949e] text-xs mt-2">Class:</div>
+                            <div class="text-green-400">GeneTokenizer</div>
+                        </div>
+
+                        <div class="text-[#c9d1d9] mt-4 mb-2"><strong>How it works:</strong></div>
+                        <ol class="text-[#c9d1d9] ml-4 list-decimal text-sm">
+                            <li>Uses a fixed vocabulary of <span class="text-green-400">20,061 HGNC gene symbols</span></li>
+                            <li>Maps genes to integers <code class="text-purple-400">[1, 20061]</code></li>
+                            <li>Special tokens: <code class="text-yellow-400">[PAD]=0</code>, <code class="text-yellow-400">[CLS]=20062</code>, <code class="text-yellow-400">[MASK]=20063</code></li>
+                        </ol>
+
+                        <div class="border-l-2 border-yellow-500 pl-3 mt-4 text-sm">
+                            <div class="text-yellow-400 mb-1">Note:</div>
+                            <div class="text-[#c9d1d9]">It does <strong>NOT</strong> use BPE (Byte Pair Encoding). It is a "Gene-level" vocabulary.<br>
+                            See: <span class="file-path">unimodal_rna_model/README.md</span></div>
+                        </div>
+
+                        <div class="text-[#c9d1d9] mt-4">Would you like to see the <code class="text-green-400">GeneTokenizer.encode()</code> method? <span class="text-green-400">[Y/n]</span></div>
+                    `
+                }
+            },
+            {
+                user: "Y",
+                ai: {
+                    think: "Reading unimodal_rna_model/data/tokenizer.py lines 45-78...",
+                    response: `
+                        <div class="text-green-400 font-bold mb-3">GeneTokenizer.encode() Method</div>
+
+                        <div class="code-block">
+                            <pre class="text-xs"><span class="text-purple-400">def</span> <span class="text-green-400">encode</span>(self, gene_list: List[str]) -> List[int]:
+    <span class="text-[#8b949e]">"""Convert gene symbols to token IDs."""</span>
+    tokens = [self.cls_token_id]  <span class="text-[#8b949e]"># Start with [CLS]</span>
+
+    <span class="text-purple-400">for</span> gene <span class="text-purple-400">in</span> gene_list:
+        <span class="text-purple-400">if</span> gene <span class="text-purple-400">in</span> self.gene_to_id:
+            tokens.append(self.gene_to_id[gene])
+        <span class="text-purple-400">else</span>:
+            <span class="text-[#8b949e]"># Unknown gene -> use [UNK] token</span>
+            tokens.append(self.unk_token_id)
+
+    <span class="text-purple-400">return</span> tokens</pre>
+                        </div>
+
+                        <div class="text-[#8b949e] text-xs mt-3">
+                            <strong>Source:</strong> <span class="file-path">unimodal_rna_model/data/tokenizer.py:45-58</span>
+                        </div>
+                    `
+                }
+            },
+            {
+                user: "How do I deploy a Neo4j instance to the dev cluster?",
+                ai: {
+                    think: "Searching Knowledge Base (Scopes: neo4j-deploy, sre, cookbooks)...",
+                    response: `
+                        <div class="text-green-400 font-bold mb-3">ANSWER: DEPLOYING NEO4J TO DEV</div>
+                        <div class="text-[#c9d1d9] mb-3">You should use the <code class="text-purple-400">neo4j-deploy</code> repository.</div>
+
+                        <div class="text-[#c9d1d9] mb-2"><strong>Steps:</strong></div>
+                        <ol class="text-[#c9d1d9] ml-4 list-decimal text-sm mb-4">
+                            <li>Clone <code class="text-purple-400">neo4j-deploy</code></li>
+                            <li>Copy <code class="text-yellow-400">values-template.yaml</code> to <code class="text-yellow-400">values-dev.yaml</code></li>
+                            <li>Run the deployment script</li>
+                        </ol>
+
+                        <div class="text-[#c9d1d9] mb-2"><strong>Required Configs:</strong></div>
+                        <table class="term-table" style="width: 80%">
+                            <tbody>
+                                <tr><td><code class="text-green-400">storage_class</code></td><td>Must be set to <code class="text-yellow-400">pd-ssd</code> for performance</td></tr>
+                                <tr><td><code class="text-green-400">namespace</code></td><td>Use <code class="text-yellow-400">neo4j-dev</code></td></tr>
+                            </tbody>
+                        </table>
+
+                        <div class="text-[#c9d1d9] mt-4 mb-2"><strong>Command to run:</strong></div>
+                        <div class="code-block">
+                            <pre class="text-xs">./sre/scripts/deploy_neo4j.sh --env dev --config values-dev.yaml</pre>
+                        </div>
+
+                        <div class="border-l-2 border-yellow-500 pl-3 mt-4 text-sm">
+                            <div class="text-yellow-400 mb-1">Warning:</div>
+                            <div class="text-[#c9d1d9]">Do <strong>NOT</strong> deploy to <code class="text-red-400">prod</code> without approval from the Platform Team.<br>
+                            Access governed by: <span class="file-path">tempathy-ofmarshal</span></div>
+                        </div>
+                    `
+                }
+            },
+            {
+                user: "My pipeline says 'Artifact rn_v2_base not found in registry.' Where was this defined?",
+                ai: {
+                    think: "Searching Knowledge Base for 'rn_v2_base'... Checking legacy manifests...",
+                    response: `
+                        <div class="text-green-400 font-bold mb-3">ANSWER: LEGACY ARTIFACT LOOKUP</div>
+                        <div class="text-[#c9d1d9] mb-3">I found references to <code class="text-purple-400">rn_v2_base</code> in <span class="file-path">ofm-baselines/legacy_manifest.json</span>.</div>
+
+                        <div class="text-[#c9d1d9] mb-2"><strong>History:</strong></div>
+                        <table class="term-table" style="width: 80%">
+                            <tbody>
+                                <tr><td>Trained</td><td>Q3 2023</td></tr>
+                                <tr><td class="text-yellow-400">Deprecated</td><td>Q1 2024 in favor of <code class="text-green-400">rn_v3_flash</code></td></tr>
+                                <tr><td>Current Location</td><td>Coldline storage (archived)</td></tr>
+                            </tbody>
+                        </table>
+
+                        <div class="border-l-2 border-green-500 pl-3 mt-4">
+                            <div class="text-green-400 font-bold text-sm mb-1">Recommended Action:</div>
+                            <div class="text-[#c9d1d9] text-sm">
+                                Update your config to use <code class="text-green-400">rn_v3_flash</code><br>
+                                <span class="text-[#8b949e]">Performance improvement: C-Index +0.05</span>
+                            </div>
+                        </div>
+
+                        <div class="code-block mt-4">
+                            <div class="text-[#8b949e] text-xs mb-2">Updated config:</div>
+                            <pre class="text-xs"><span class="diff-remove">- checkpoint: atlas://registry/rn_v2_base</span>
+<span class="diff-add">+ checkpoint: atlas://registry/rn_v3_flash</span></pre>
+                        </div>
+
+                        <div class="text-[#c9d1d9] mt-4">Apply this fix to your config? <span class="text-green-400">[Y/n]</span></div>
+                    `
+                }
+            },
+            {
+                user: "Y",
+                ai: {
+                    think: "Updating config... Validating artifact reference...",
+                    response: `
+                        <div class="text-green-400 mb-2">✔ Config updated successfully.</div>
+                        <div class="text-[#c9d1d9]">Artifact reference changed from <code class="text-red-400">rn_v2_base</code> to <code class="text-green-400">rn_v3_flash</code>.</div>
+
+                        <div class="text-[#8b949e] text-sm mt-4 border-l-2 border-[#30363d] pl-3">
+                            <strong>Artifact Details:</strong><br>
+                            URI: <code class="text-purple-400">atlas://registry/rn_v3_flash</code><br>
+                            Size: 2.1GB<br>
+                            C-Index: 0.72 <span class="text-green-400">(+0.05 vs v2)</span>
+                        </div>
+                    `
+                }
+            },
+            {
+                user: "Where does the VEP runner config logic live?",
+                ai: {
+                    think: "Searching Knowledge Base (Scopes: molecular-models, variant-calling, genomics-pipelines)...",
+                    response: `
+                        <div class="text-green-400 font-bold mb-3">ANSWER: VEP RUNNER CONFIG</div>
+                        <div class="text-[#c9d1d9] mb-3">The VEP (Variant Effect Predictor) runner configuration is split across two repositories:</div>
+
+                        <div class="mb-4">
+                            <div class="text-[#c9d1d9] mb-2"><strong>1. Core Runner Logic:</strong></div>
+                            <div class="code-block">
+                                <div class="file-path">genomics-pipelines/vep/runner.py</div>
+                                <div class="text-[#8b949e] text-xs mt-1">Class: <code class="text-green-400">VEPRunner</code></div>
+                                <div class="text-[#8b949e] text-xs">Handles: Job submission, output parsing</div>
+                            </div>
+                        </div>
+
+                        <div class="mb-4">
+                            <div class="text-[#c9d1d9] mb-2"><strong>2. Configuration Schema:</strong></div>
+                            <div class="code-block">
+                                <div class="file-path">variant-calling/configs/vep_defaults.yaml</div>
+                                <div class="text-[#8b949e] text-xs mt-1">Contains: Reference genome paths, plugin configs, output formats</div>
+                            </div>
+                        </div>
+
+                        <div class="text-[#c9d1d9] mb-2"><strong>Key Configuration Options:</strong></div>
+                        <table class="term-table" style="width: 100%">
+                            <thead><tr><th>Option</th><th>Default</th><th>Description</th></tr></thead>
+                            <tbody>
+                                <tr><td><code class="text-green-400">assembly</code></td><td>GRCh38</td><td>Reference genome version</td></tr>
+                                <tr><td><code class="text-green-400">cache_dir</code></td><td>gs://vep-cache/</td><td>VEP cache location</td></tr>
+                                <tr><td><code class="text-green-400">plugins</code></td><td>[CADD, SpliceAI]</td><td>Annotation plugins</td></tr>
+                            </tbody>
+                        </table>
+
+                        <div class="text-[#8b949e] text-xs mt-4 border-l-2 border-[#30363d] pl-3">
+                            <strong>Related Documentation:</strong><br>
+                            - <span class="file-path">genomics-pipelines/docs/vep-setup.md</span><br>
+                            - Confluence: "Variant Annotation Pipeline Guide"
+                        </div>
+                    `
+                }
+            }
+        ];
+
+        const state = { step: 0, isTyping: false, isThinking: false, typedText: "" };
+        const elements = {
+            history: document.getElementById('history'),
+            input: document.getElementById('terminal-input'),
+            ghost: document.getElementById('ghost-text'),
+            output: document.getElementById('terminal-output')
+        };
+
+        function startScenario() {
+            state.step = 0;
+            elements.history.innerHTML = '';
+            const div = document.createElement('div');
+            div.className = "my-4 border-t border-dashed border-slate-700 pt-2 text-center text-xs text-slate-600";
+            div.innerText = `--- NEW SESSION: REPOSITORY DISCOVERY ---`;
+            elements.history.appendChild(div);
+            prepareStep();
+        }
+
+        function prepareStep() {
+            if (state.step >= endToEndScenario.length) {
+                state.targetText = "";
+                elements.input.value = "";
+                elements.ghost.textContent = "";
+
+                const endDiv = document.createElement('div');
+                endDiv.className = "mt-8 text-center text-[#8b949e] text-xs animate-pulse";
+                endDiv.innerText = "[ END OF REPO DISCOVERY DEMO ]";
+                elements.history.appendChild(endDiv);
+                scrollToBottom();
+                window.parent.postMessage({ type: 'workflowComplete' }, '*');
+                return;
+            }
+            state.targetText = endToEndScenario[state.step].user;
+            state.typedText = "";
+            elements.input.value = "";
+            elements.ghost.textContent = "";
+            elements.input.focus();
+            scrollToBottom();
+        }
+
+        function scrollToBottom() {
+            elements.output.scrollTop = elements.output.scrollHeight;
+            requestAnimationFrame(() => {
+                elements.output.scrollTop = elements.output.scrollHeight;
+            });
+        }
+
+        function addEntry(type, content) {
+            const div = document.createElement('div');
+            div.className = "mb-6 animate-fade-in";
+
+            if (type === 'user') {
+                div.innerHTML = `
+                    <div class="flex items-start">
+                        <span class="text-green-400 font-bold mr-2 mt-0.5">❯</span>
+                        <div class="text-[#e6edf3] font-semibold">${content}</div>
+                    </div>
+                `;
+            } else if (type === 'ai') {
+                div.innerHTML = `
+                    <div class="flex items-start mt-2">
+                        <div class="text-purple-400 font-bold mr-3 mt-0.5 text-xs">GREMLIN</div>
+                        <div class="flex-grow text-[#c9d1d9] leading-relaxed text-sm">${content}</div>
+                    </div>
+                `;
+            } else if (type === 'think') {
+                div.id = "thinking";
+                div.innerHTML = `
+                    <div class="flex items-center text-slate-500 text-xs ml-9 animate-pulse font-mono">
+                        <i class="fa-solid fa-microchip mr-2"></i> ${content}
+                    </div>
+                `;
+            }
+            elements.history.appendChild(div);
+            scrollToBottom();
+            return div;
+        }
+
+        function submit() {
+            if (state.step >= endToEndScenario.length) return;
+
+            const text = elements.input.value;
+            if (!text.trim()) return;
+
+            addEntry('user', text);
+            elements.input.value = "";
+            elements.ghost.textContent = "";
+            state.typedText = "";
+
+            state.isThinking = true;
+            const scenario = endToEndScenario[state.step];
+            const thinkEl = addEntry('think', scenario.ai.think);
+
+            setTimeout(() => {
+                thinkEl.innerHTML = `
+                    <div class="flex items-center text-slate-600 text-xs ml-9 font-mono">
+                        <span class="text-green-500 mr-2">[LOG]</span> ${scenario.ai.think.replace('...', '')} ... <span class="text-green-500 ml-1">DONE</span>
+                    </div>
+                `;
+                thinkEl.id = "";
+                thinkEl.classList.remove("animate-pulse");
+
+                addEntry('ai', scenario.ai.response);
+
+                state.isThinking = false;
+                state.step++;
+
+                window.parent.postMessage({ type: 'cliStepComplete', step: state.step }, '*');
+
+                prepareStep();
+            }, 1200);
+        }
+
+        elements.input.addEventListener('keydown', (e) => {
+            if (state.isThinking || state.step >= endToEndScenario.length) {
+                e.preventDefault();
+                return;
+            }
+
+            if (e.key === 'Tab') {
+                e.preventDefault();
+                if (state.typedText.length < state.targetText.length) {
+                    state.typedText = state.targetText;
+                    elements.input.value = state.typedText;
+                    elements.ghost.textContent = state.typedText;
+                    scrollToBottom();
+                }
+                return;
+            }
+
+            if (e.key === 'Enter') {
+                state.typedText = state.targetText;
+                elements.input.value = state.typedText;
+                elements.ghost.textContent = state.typedText;
+                submit();
+                e.preventDefault();
+            } else if (e.key === 'Backspace') {
+                state.typedText = state.typedText.slice(0, -1);
+                e.preventDefault();
+            } else if (!e.ctrlKey && !e.metaKey && !e.altKey && e.key.length === 1) {
+                e.preventDefault();
+                const nextChar = state.targetText[state.typedText.length];
+                if (nextChar) state.typedText += nextChar;
+            }
+
+            elements.input.value = state.typedText;
+            elements.ghost.textContent = state.typedText;
+            scrollToBottom();
+        });
+
+        document.getElementById('terminal-output').addEventListener('click', () => elements.input.focus());
+
+        window.addEventListener('message', (event) => {
+            if (event.data && event.data.type === 'resetWorkflow') {
+                startScenario();
+            }
+        });
+
+        startScenario();
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Data Products Integration - Walkthrough</title>
+    <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif; line-height: 1.6; color: #c9d1d9; background-color: #0d1117; max-width: 800px; margin: 0 auto; padding: 40px 20px; }
+        h1, h2, h3 { color: #ffffff; border-bottom: 1px solid #21262d; padding-bottom: .3em; }
+        h1 { font-size: 2em; border-bottom: none; }
+        h2 { margin-top: 2em; }
+        a { color: #58a6ff; text-decoration: none; }
+        code { background-color: #161b22; padding: 0.2em 0.4em; border-radius: 6px; font-family: ui-monospace, SFMono-Regular, SF Mono, Menlo, Consolas, Liberation Mono, monospace; font-size: 85%; }
+        blockquote { color: #8b949e; border-left: 0.25em solid #30363d; padding: 0 1em; margin: 0; }
+        .markdown-alert { padding: 8px 16px; margin-bottom: 16px; border-left: 0.25em solid; border-radius: 6px; }
+        .markdown-alert-tip { border-color: #3fb950; background-color: #161b22; }
+        .markdown-alert-important { border-color: #a371f7; background-color: #161b22; }
+        .markdown-alert-warning { border-color: #d29922; background-color: #161b22; }
+        .markdown-alert-title { display: flex; align-items: center; font-weight: 600; margin-bottom: 8px; }
+        .markdown-alert-tip .markdown-alert-title { color: #3fb950; }
+        .markdown-alert-important .markdown-alert-title { color: #a371f7; }
+        .markdown-alert-warning .markdown-alert-title { color: #d29922; }
+        .subtitle { color: #8b949e; font-style: italic; margin-top: -10px; display: block; margin-bottom: 30px; }
+        .section-desc { color: #8b949e; font-style: italic; margin-bottom: 16px; display: block; }
+        .stat-highlight { background: linear-gradient(90deg, rgba(63, 185, 80, 0.1), transparent); border-left: 3px solid #3fb950; padding: 12px 16px; margin: 16px 0; }
+        .stat-value { font-size: 1.5em; font-weight: bold; color: #3fb950; }
+        .stat-label { color: #8b949e; font-size: 0.9em; }
+        .comparison-table { width: 100%; border-collapse: collapse; margin: 1rem 0; }
+        .comparison-table th, .comparison-table td { border: 1px solid #30363d; padding: 8px 12px; text-align: left; }
+        .comparison-table th { background-color: #161b22; color: #8b949e; }
+    </style>
+</head>
+
+<body>
+
+    <h1>Data Products Integration</h1>
+    <span class="subtitle">From ad-hoc CSV files to immutable, versioned datasets</span>
+
+    <p>This demo illustrates how GREMLIN bridges the gap between raw data and reproducible ML experiments through the Tempus Data Products platform.</p>
+
+    <div class="stat-highlight">
+        <div class="stat-value">Reproducibility First</div>
+        <div class="stat-label">Immutable datasets with full lineage tracking</div>
+    </div>
+
+    <h2 id="step-1">1. Discovery: "What's in the Pantry?"</h2>
+    <span class="section-desc">Finding available Data Products for your research.</span>
+
+    <p><strong>Input</strong>:</p>
+    <blockquote>"Find Data Products for Non-Small Cell Lung Cancer with molecular data."</blockquote>
+    <br>
+
+    <div class="markdown-alert markdown-alert-tip">
+        <div class="markdown-alert-title">
+            <svg class="octicon" viewBox="0 0 16 16" version="1.1" width="16" height="16" fill="currentColor" style="margin-right: 8px;">
+                <path d="M8 1.5c-2.363 0-4 1.69-4 3.75 0 .984.424 1.625.984 2.304l.214.253c.223.264.47.556.673.848.284.411.537.896.621 1.49a.75.75 0 0 1-1.484.211c-.04-.282-.163-.547-.37-.847a8.456 8.456 0 0 0-.542-.68c-.084-.1-.173-.205-.268-.32C3.201 7.025 2.5 6.227 2.5 5.25 2.5 2.31 4.863 0 8 0s5.5 2.31 5.5 5.25c0 .977-.701 1.775-1.328 2.259-.095.115-.184.22-.268.319-.207.245-.383.453-.541.681-.208.3-.33.565-.37.847a.751.751 0 0 1-1.485-.212c.084-.593.337-1.078.621-1.489.203-.292.45-.584.673-.848.075-.088.147-.173.213-.253.561-.679.985-1.32.985-2.304 0-2.06-1.637-3.75-4-3.75ZM5.75 12h4.5a.75.75 0 0 1 0 1.5h-4.5a.75.75 0 0 1 0-1.5ZM6 15.25a.75.75 0 0 1 .75-.75h2.5a.75.75 0 0 1 0 1.5h-2.5a.75.75 0 0 1-.75-.75Z"></path>
+            </svg>
+            Key Concepts
+        </div>
+        <ul>
+            <li><strong>Natural Language Search</strong>: No need to know exact Data Product names or navigate complex UIs.</li>
+            <li><strong>Classification Visibility</strong>: See data sensitivity levels (SECRET/PHI) upfront.</li>
+            <li><strong>Version Awareness</strong>: Know exactly which version you're getting.</li>
+        </ul>
+    </div>
+
+    <h2 id="step-2">2. Schema Exploration</h2>
+    <span class="section-desc">Understanding data structure before writing queries.</span>
+
+    <p><strong>Input</strong>:</p>
+    <blockquote>"describe clinical_nsclc_outcomes"</blockquote>
+    <br>
+
+    <div class="markdown-alert markdown-alert-important">
+        <div class="markdown-alert-title">
+            <svg class="octicon" viewBox="0 0 16 16" version="1.1" width="16" height="16" fill="currentColor" style="margin-right: 8px;">
+                <path d="M0 1.75C0 .784.784 0 1.75 0h12.5C15.216 0 16 .784 16 1.75v9.5A1.75 1.75 0 0 1 14.25 13H8.06l-2.573 2.573A1.458 1.458 0 0 1 3 14.543V13H1.75A1.75 1.75 0 0 1 0 11.25Zm1.75-.25a.25.25 0 0 0-.25.25v9.5c0 .138.112.25.25.25h2a.75.75 0 0 1 .75.75v2.19l2.72-2.72a.75.75 0 0 1 .53-.22h6.5a.25.25 0 0 0 .25-.25v-9.5a.25.25 0 0 0-.25-.25Zm7 2.25v2.5a.75.75 0 0 1-1.5 0v-2.5a.75.75 0 0 1 1.5 0ZM9 9a1 1 0 1 1-2 0 1 1 0 0 1 2 0Z"></path>
+            </svg>
+            Insight: Self-Service Schema Browser
+        </div>
+        <p>GREMLIN provides instant access to:</p>
+        <ul>
+            <li><strong>Full Schema</strong>: Field names, types, and descriptions.</li>
+            <li><strong>Required vs Optional</strong>: Know what data is guaranteed vs. potentially null.</li>
+            <li><strong>Your Access Level</strong>: Verify permissions before writing queries.</li>
+        </ul>
+    </div>
+
+    <h2 id="step-3">3. Access & Join Generation</h2>
+    <span class="section-desc">Requesting access and generating validated queries.</span>
+
+    <p><strong>Input</strong>:</p>
+    <blockquote>"I need to join clinical_nsclc_outcomes with rna_expression_nsclc for patients with 1L data."</blockquote>
+    <br>
+
+    <div class="markdown-alert markdown-alert-warning">
+        <div class="markdown-alert-title">
+            <svg class="octicon" viewBox="0 0 16 16" version="1.1" width="16" height="16" fill="currentColor" style="margin-right: 8px;">
+                <path d="M6.457 1.047c.659-1.234 2.427-1.234 3.086 0l6.082 11.378A1.75 1.75 0 0 1 14.082 15H1.918a1.75 1.75 0 0 1-1.543-2.575Zm1.763.707a.25.25 0 0 0-.44 0L1.698 13.132a.25.25 0 0 0 .22.368h12.164a.25.25 0 0 0 .22-.368Zm.53 3.996v2.5a.75.75 0 0 1-1.5 0v-2.5a.75.75 0 0 1 1.5 0ZM9 11a1 1 0 1 1-2 0 1 1 0 0 1 2 0Z"></path>
+            </svg>
+            Automated Access Workflow
+        </div>
+        <ul>
+            <li><strong>Permission Check</strong>: GREMLIN verifies access before you start working.</li>
+            <li><strong>Auto-Request</strong>: Missing permissions trigger automatic access requests.</li>
+            <li><strong>Query Pre-Generation</strong>: Get the validated SQL while waiting for approval.</li>
+        </ul>
+    </div>
+
+    <h2 id="step-4">4. Pin & Version: "Seal the Jar"</h2>
+    <span class="section-desc">Creating immutable dataset snapshots.</span>
+
+    <p><strong>Input</strong>:</p>
+    <blockquote>"Pin this cohort as 'nsclc_fusion_train_v1' for my experiment."</blockquote>
+    <br>
+
+    <div class="markdown-alert markdown-alert-tip">
+        <div class="markdown-alert-title">
+            <svg class="octicon" viewBox="0 0 16 16" version="1.1" width="16" height="16" fill="currentColor" style="margin-right: 8px;">
+                <path d="M8 1.5c-2.363 0-4 1.69-4 3.75 0 .984.424 1.625.984 2.304l.214.253c.223.264.47.556.673.848.284.411.537.896.621 1.49a.75.75 0 0 1-1.484.211c-.04-.282-.163-.547-.37-.847a8.456 8.456 0 0 0-.542-.68c-.084-.1-.173-.205-.268-.32C3.201 7.025 2.5 6.227 2.5 5.25 2.5 2.31 4.863 0 8 0s5.5 2.31 5.5 5.25c0 .977-.701 1.775-1.328 2.259-.095.115-.184.22-.268.319-.207.245-.383.453-.541.681-.208.3-.33.565-.37.847a.751.751 0 0 1-1.485-.212c.084-.593.337-1.078.621-1.489.203-.292.45-.584.673-.848.075-.088.147-.173.213-.253.561-.679.985-1.32.985-2.304 0-2.06-1.637-3.75-4-3.75ZM5.75 12h4.5a.75.75 0 0 1 0 1.5h-4.5a.75.75 0 0 1 0-1.5ZM6 15.25a.75.75 0 0 1 .75-.75h2.5a.75.75 0 0 1 0 1.5h-2.5a.75.75 0 0 1-.75-.75Z"></path>
+            </svg>
+            Key Concepts
+        </div>
+        <ul>
+            <li><strong>Immutable Artifacts</strong>: SHA-pinned datasets that never change.</li>
+            <li><strong>Full Lineage</strong>: Track exactly which source Data Products were used.</li>
+            <li><strong>Atlas Registration</strong>: Proper URI (<code>atlas://datasets/...</code>) for experiment configs.</li>
+        </ul>
+    </div>
+
+    <h2 id="step-5">5. Audit: "Where Did This Come From?"</h2>
+    <span class="section-desc">Tracing model provenance for debugging.</span>
+
+    <p><strong>Input</strong>:</p>
+    <blockquote>"What data was model 'nsclc_fusion_prod_v2' trained on?"</blockquote>
+    <br>
+
+    <div class="markdown-alert markdown-alert-important">
+        <div class="markdown-alert-title">
+            <svg class="octicon" viewBox="0 0 16 16" version="1.1" width="16" height="16" fill="currentColor" style="margin-right: 8px;">
+                <path d="M0 1.75C0 .784.784 0 1.75 0h12.5C15.216 0 16 .784 16 1.75v9.5A1.75 1.75 0 0 1 14.25 13H8.06l-2.573 2.573A1.458 1.458 0 0 1 3 14.543V13H1.75A1.75 1.75 0 0 1 0 11.25Zm1.75-.25a.25.25 0 0 0-.25.25v9.5c0 .138.112.25.25.25h2a.75.75 0 0 1 .75.75v2.19l2.72-2.72a.75.75 0 0 1 .53-.22h6.5a.25.25 0 0 0 .25-.25v-9.5a.25.25 0 0 0-.25-.25Zm7 2.25v2.5a.75.75 0 0 1-1.5 0v-2.5a.75.75 0 0 1 1.5 0ZM9 9a1 1 0 1 1-2 0 1 1 0 0 1 2 0Z"></path>
+            </svg>
+            Insight: Proactive Issue Detection
+        </div>
+        <p>GREMLIN doesn't just trace lineage—it identifies problems:</p>
+        <ul>
+            <li><strong>Deprecation Alerts</strong>: Flags when source data has been updated.</li>
+            <li><strong>Bug References</strong>: Links to JIRAs explaining what changed.</li>
+            <li><strong>Impact Assessment</strong>: Suggests when retraining is warranted.</li>
+        </ul>
+    </div>
+
+    <h2 id="step-6">6. Differential Analysis</h2>
+    <span class="section-desc">Comparing data versions before retraining.</span>
+
+    <p><strong>Input</strong>:</p>
+    <blockquote>"Y" (Compare versions)</blockquote>
+    <br>
+
+    <div class="markdown-alert markdown-alert-tip">
+        <div class="markdown-alert-title">
+            <svg class="octicon" viewBox="0 0 16 16" version="1.1" width="16" height="16" fill="currentColor" style="margin-right: 8px;">
+                <path d="M8 1.5c-2.363 0-4 1.69-4 3.75 0 .984.424 1.625.984 2.304l.214.253c.223.264.47.556.673.848.284.411.537.896.621 1.49a.75.75 0 0 1-1.484.211c-.04-.282-.163-.547-.37-.847a8.456 8.456 0 0 0-.542-.68c-.084-.1-.173-.205-.268-.32C3.201 7.025 2.5 6.227 2.5 5.25 2.5 2.31 4.863 0 8 0s5.5 2.31 5.5 5.25c0 .977-.701 1.775-1.328 2.259-.095.115-.184.22-.268.319-.207.245-.383.453-.541.681-.208.3-.33.565-.37.847a.751.751 0 0 1-1.485-.212c.084-.593.337-1.078.621-1.489.203-.292.45-.584.673-.848.075-.088.147-.173.213-.253.561-.679.985-1.32.985-2.304 0-2.06-1.637-3.75-4-3.75ZM5.75 12h4.5a.75.75 0 0 1 0 1.5h-4.5a.75.75 0 0 1 0-1.5ZM6 15.25a.75.75 0 0 1 .75-.75h2.5a.75.75 0 0 1 0 1.5h-2.5a.75.75 0 0 1-.75-.75Z"></path>
+            </svg>
+            Key Concepts
+        </div>
+        <ul>
+            <li><strong>Quantitative Diff</strong>: Patient counts, gene coverage, distribution changes.</li>
+            <li><strong>Actionable Recommendations</strong>: Clear guidance on whether to retrain.</li>
+            <li><strong>One-Click Updates</strong>: Create new cohorts with updated versions instantly.</li>
+        </ul>
+    </div>
+
+    <h2>The Data Products Bridge</h2>
+
+    <table class="comparison-table">
+        <tr>
+            <th>Without GREMLIN</th>
+            <th>With GREMLIN</th>
+        </tr>
+        <tr>
+            <td>Navigate Core Platform UI</td>
+            <td>Natural language search</td>
+        </tr>
+        <tr>
+            <td>Write raw BigQuery SQL</td>
+            <td>Auto-generated, validated queries</td>
+        </tr>
+        <tr>
+            <td>Manual ServiceNow tickets</td>
+            <td>Automated access requests</td>
+        </tr>
+        <tr>
+            <td>Copy-paste GCS paths</td>
+            <td>Pinned Atlas URIs with lineage</td>
+        </tr>
+        <tr>
+            <td>README.md documentation</td>
+            <td>Queryable provenance graph</td>
+        </tr>
+    </table>
+
+    <div class="stat-highlight">
+        <div class="stat-value">100% Reproducible</div>
+        <div class="stat-label">Every experiment traces back to exact data versions</div>
+    </div>
+
+    <script>
+        window.addEventListener('message', (event) => {
+            if (event.data && event.data.type === 'scrollToStep') {
+                const stepId = `step-${event.data.step}`;
+                const element = document.getElementById(stepId);
+                if (element) { element.scrollIntoView({ behavior: 'smooth', block: 'start' }); }
+            }
+        });
+    </script>
+
+</body>
+
+</html>

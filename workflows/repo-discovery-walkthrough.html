@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Repository Discovery - Walkthrough</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+            line-height: 1.6;
+            color: #c9d1d9;
+            background-color: #0d1117;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+
+        h1, h2, h3 { color: #ffffff; border-bottom: 1px solid #21262d; padding-bottom: .3em; }
+        h1 { font-size: 2em; border-bottom: none; }
+        h2 { margin-top: 2em; }
+        a { color: #58a6ff; text-decoration: none; }
+        code { background-color: #161b22; padding: 0.2em 0.4em; border-radius: 6px; font-family: ui-monospace, SFMono-Regular, SF Mono, Menlo, Consolas, Liberation Mono, monospace; font-size: 85%; }
+        blockquote { color: #8b949e; border-left: 0.25em solid #30363d; padding: 0 1em; margin: 0; }
+
+        .markdown-alert { padding: 8px 16px; margin-bottom: 16px; border-left: 0.25em solid; border-radius: 6px; }
+        .markdown-alert-tip { border-color: #3fb950; background-color: #161b22; }
+        .markdown-alert-important { border-color: #a371f7; background-color: #161b22; }
+        .markdown-alert-title { display: flex; align-items: center; font-weight: 600; margin-bottom: 8px; }
+        .markdown-alert-tip .markdown-alert-title { color: #3fb950; }
+        .markdown-alert-important .markdown-alert-title { color: #a371f7; }
+
+        .subtitle { color: #8b949e; font-style: italic; margin-top: -10px; display: block; margin-bottom: 30px; }
+        .section-desc { color: #8b949e; font-style: italic; margin-bottom: 16px; display: block; }
+
+        .stat-highlight {
+            background: linear-gradient(90deg, rgba(63, 185, 80, 0.1), transparent);
+            border-left: 3px solid #3fb950;
+            padding: 12px 16px;
+            margin: 16px 0;
+        }
+        .stat-value { font-size: 1.5em; font-weight: bold; color: #3fb950; }
+        .stat-label { color: #8b949e; font-size: 0.9em; }
+
+        .comparison-table { width: 100%; border-collapse: collapse; margin: 1rem 0; }
+        .comparison-table th, .comparison-table td { border: 1px solid #30363d; padding: 8px 12px; text-align: left; }
+        .comparison-table th { background-color: #161b22; color: #8b949e; }
+    </style>
+</head>
+
+<body>
+
+    <h1>The Knowledge Engine</h1>
+    <span class="subtitle">Semantic search across 74+ repositories</span>
+
+    <p>This demo illustrates how GREMLIN transforms code discovery from "Slack and pray" to instant, authoritative answers with exact file paths and line numbers.</p>
+
+    <div class="stat-highlight">
+        <div class="stat-value">74+ Repositories</div>
+        <div class="stat-label">Indexed in GREMLIN's vector store for semantic search</div>
+    </div>
+
+    <h2 id="step-1">1. Finding Logic in the Haystack</h2>
+    <span class="section-desc">Locating implementation details across multiple repos.</span>
+
+    <p><strong>Input</strong>:</p>
+    <blockquote>"Where is the tokenizer logic for the RNA BERT model?"</blockquote>
+    <br>
+
+    <div class="markdown-alert markdown-alert-tip">
+        <div class="markdown-alert-title">
+            <svg class="octicon" viewBox="0 0 16 16" version="1.1" width="16" height="16" fill="currentColor" style="margin-right: 8px;">
+                <path d="M8 1.5c-2.363 0-4 1.69-4 3.75 0 .984.424 1.625.984 2.304l.214.253c.223.264.47.556.673.848.284.411.537.896.621 1.49a.75.75 0 0 1-1.484.211c-.04-.282-.163-.547-.37-.847a8.456 8.456 0 0 0-.542-.68c-.084-.1-.173-.205-.268-.32C3.201 7.025 2.5 6.227 2.5 5.25 2.5 2.31 4.863 0 8 0s5.5 2.31 5.5 5.25c0 .977-.701 1.775-1.328 2.259-.095.115-.184.22-.268.319-.207.245-.383.453-.541.681-.208.3-.33.565-.37.847a.751.751 0 0 1-1.485-.212c.084-.593.337-1.078.621-1.489.203-.292.45-.584.673-.848.075-.088.147-.173.213-.253.561-.679.985-1.32.985-2.304 0-2.06-1.637-3.75-4-3.75ZM5.75 12h4.5a.75.75 0 0 1 0 1.5h-4.5a.75.75 0 0 1 0-1.5ZM6 15.25a.75.75 0 0 1 .75-.75h2.5a.75.75 0 0 1 0 1.5h-2.5a.75.75 0 0 1-.75-.75Z"></path>
+            </svg>
+            Key Concepts
+        </div>
+        <ul>
+            <li><strong>Semantic Understanding</strong>: GREMLIN knows that "RNA BERT" refers to <code>unimodal-rna-model</code>, not the 5 other RNA repos.</li>
+            <li><strong>Precise Answers</strong>: Returns exact file path, class name, and architectural explanation.</li>
+            <li><strong>Contextual Knowledge</strong>: Explains that it uses gene-level vocabulary, NOT BPE.</li>
+        </ul>
+    </div>
+
+    <h2 id="step-2">2. Code Inspection</h2>
+    <span class="section-desc">Drilling into implementation details.</span>
+
+    <p><strong>Input</strong>:</p>
+    <blockquote>"Y" (Show the encode method)</blockquote>
+    <br>
+
+    <div class="markdown-alert markdown-alert-important">
+        <div class="markdown-alert-title">
+            <svg class="octicon" viewBox="0 0 16 16" version="1.1" width="16" height="16" fill="currentColor" style="margin-right: 8px;">
+                <path d="M0 1.75C0 .784.784 0 1.75 0h12.5C15.216 0 16 .784 16 1.75v9.5A1.75 1.75 0 0 1 14.25 13H8.06l-2.573 2.573A1.458 1.458 0 0 1 3 14.543V13H1.75A1.75 1.75 0 0 1 0 11.25Zm1.75-.25a.25.25 0 0 0-.25.25v9.5c0 .138.112.25.25.25h2a.75.75 0 0 1 .75.75v2.19l2.72-2.72a.75.75 0 0 1 .53-.22h6.5a.25.25 0 0 0 .25-.25v-9.5a.25.25 0 0 0-.25-.25Zm7 2.25v2.5a.75.75 0 0 1-1.5 0v-2.5a.75.75 0 0 1 1.5 0ZM9 9a1 1 0 1 1-2 0 1 1 0 0 1 2 0Z"></path>
+            </svg>
+            Insight: Indexed Code Access
+        </div>
+        <p>GREMLIN provides:</p>
+        <ul>
+            <li><strong>Syntax-Highlighted Code</strong>: Readable presentation of source code.</li>
+            <li><strong>Line Number References</strong>: <code>tokenizer.py:45-58</code> for easy navigation.</li>
+            <li><strong>In-Context Understanding</strong>: No need to clone repos or set up environments.</li>
+        </ul>
+    </div>
+
+    <h2 id="step-3">3. Infrastructure How-To</h2>
+    <span class="section-desc">Step-by-step guides for platform tasks.</span>
+
+    <p><strong>Input</strong>:</p>
+    <blockquote>"How do I deploy a Neo4j instance to the dev cluster?"</blockquote>
+    <br>
+
+    <div class="markdown-alert markdown-alert-tip">
+        <div class="markdown-alert-title">
+            <svg class="octicon" viewBox="0 0 16 16" version="1.1" width="16" height="16" fill="currentColor" style="margin-right: 8px;">
+                <path d="M8 1.5c-2.363 0-4 1.69-4 3.75 0 .984.424 1.625.984 2.304l.214.253c.223.264.47.556.673.848.284.411.537.896.621 1.49a.75.75 0 0 1-1.484.211c-.04-.282-.163-.547-.37-.847a8.456 8.456 0 0 0-.542-.68c-.084-.1-.173-.205-.268-.32C3.201 7.025 2.5 6.227 2.5 5.25 2.5 2.31 4.863 0 8 0s5.5 2.31 5.5 5.25c0 .977-.701 1.775-1.328 2.259-.095.115-.184.22-.268.319-.207.245-.383.453-.541.681-.208.3-.33.565-.37.847a.751.751 0 0 1-1.485-.212c.084-.593.337-1.078.621-1.489.203-.292.45-.584.673-.848.075-.088.147-.173.213-.253.561-.679.985-1.32.985-2.304 0-2.06-1.637-3.75-4-3.75ZM5.75 12h4.5a.75.75 0 0 1 0 1.5h-4.5a.75.75 0 0 1 0-1.5ZM6 15.25a.75.75 0 0 1 .75-.75h2.5a.75.75 0 0 1 0 1.5h-2.5a.75.75 0 0 1-.75-.75Z"></path>
+            </svg>
+            Key Concepts
+        </div>
+        <ul>
+            <li><strong>Actionable Steps</strong>: Not just "read the docs" - exact commands to run.</li>
+            <li><strong>Required Configs</strong>: Highlights critical settings (<code>storage_class: pd-ssd</code>).</li>
+            <li><strong>Safety Warnings</strong>: Prevents accidental production deployments.</li>
+        </ul>
+    </div>
+
+    <h2 id="step-4">4. Legacy Artifact Discovery</h2>
+    <span class="section-desc">Tracing deprecated artifacts to their replacements.</span>
+
+    <p><strong>Input</strong>:</p>
+    <blockquote>"My pipeline says 'Artifact rn_v2_base not found in registry.' Where was this defined?"</blockquote>
+    <br>
+
+    <div class="markdown-alert markdown-alert-important">
+        <div class="markdown-alert-title">
+            <svg class="octicon" viewBox="0 0 16 16" version="1.1" width="16" height="16" fill="currentColor" style="margin-right: 8px;">
+                <path d="M0 1.75C0 .784.784 0 1.75 0h12.5C15.216 0 16 .784 16 1.75v9.5A1.75 1.75 0 0 1 14.25 13H8.06l-2.573 2.573A1.458 1.458 0 0 1 3 14.543V13H1.75A1.75 1.75 0 0 1 0 11.25Zm1.75-.25a.25.25 0 0 0-.25.25v9.5c0 .138.112.25.25.25h2a.75.75 0 0 1 .75.75v2.19l2.72-2.72a.75.75 0 0 1 .53-.22h6.5a.25.25 0 0 0 .25-.25v-9.5a.25.25 0 0 0-.25-.25Zm7 2.25v2.5a.75.75 0 0 1-1.5 0v-2.5a.75.75 0 0 1 1.5 0ZM9 9a1 1 0 1 1-2 0 1 1 0 0 1 2 0Z"></path>
+            </svg>
+            Insight: Institutional Memory
+        </div>
+        <p>GREMLIN answers questions that normally require Slack archaeology:</p>
+        <ul>
+            <li><strong>Historical Context</strong>: Knows when <code>rn_v2_base</code> was trained and deprecated.</li>
+            <li><strong>Migration Path</strong>: Suggests the modern replacement (<code>rn_v3_flash</code>).</li>
+            <li><strong>Performance Data</strong>: Notes the +0.05 C-Index improvement.</li>
+        </ul>
+    </div>
+
+    <h2 id="step-5">5. One-Click Fix</h2>
+    <span class="section-desc">Applying recommended changes automatically.</span>
+
+    <p><strong>Input</strong>:</p>
+    <blockquote>"Y" (Apply the fix)</blockquote>
+    <br>
+
+    <div class="markdown-alert markdown-alert-tip">
+        <div class="markdown-alert-title">
+            <svg class="octicon" viewBox="0 0 16 16" version="1.1" width="16" height="16" fill="currentColor" style="margin-right: 8px;">
+                <path d="M8 1.5c-2.363 0-4 1.69-4 3.75 0 .984.424 1.625.984 2.304l.214.253c.223.264.47.556.673.848.284.411.537.896.621 1.49a.75.75 0 0 1-1.484.211c-.04-.282-.163-.547-.37-.847a8.456 8.456 0 0 0-.542-.68c-.084-.1-.173-.205-.268-.32C3.201 7.025 2.5 6.227 2.5 5.25 2.5 2.31 4.863 0 8 0s5.5 2.31 5.5 5.25c0 .977-.701 1.775-1.328 2.259-.095.115-.184.22-.268.319-.207.245-.383.453-.541.681-.208.3-.33.565-.37.847a.751.751 0 0 1-1.485-.212c.084-.593.337-1.078.621-1.489.203-.292.45-.584.673-.848.075-.088.147-.173.213-.253.561-.679.985-1.32.985-2.304 0-2.06-1.637-3.75-4-3.75ZM5.75 12h4.5a.75.75 0 0 1 0 1.5h-4.5a.75.75 0 0 1 0-1.5ZM6 15.25a.75.75 0 0 1 .75-.75h2.5a.75.75 0 0 1 0 1.5h-2.5a.75.75 0 0 1-.75-.75Z"></path>
+            </svg>
+            Key Concepts
+        </div>
+        <ul>
+            <li><strong>Validated Updates</strong>: GREMLIN verifies the new artifact exists before applying.</li>
+            <li><strong>Artifact Metadata</strong>: Shows URI, size, and performance metrics.</li>
+        </ul>
+    </div>
+
+    <h2 id="step-6">6. Complex System Discovery</h2>
+    <span class="section-desc">Understanding multi-repo architectures.</span>
+
+    <p><strong>Input</strong>:</p>
+    <blockquote>"Where does the VEP runner config logic live?"</blockquote>
+    <br>
+
+    <div class="markdown-alert markdown-alert-tip">
+        <div class="markdown-alert-title">
+            <svg class="octicon" viewBox="0 0 16 16" version="1.1" width="16" height="16" fill="currentColor" style="margin-right: 8px;">
+                <path d="M8 1.5c-2.363 0-4 1.69-4 3.75 0 .984.424 1.625.984 2.304l.214.253c.223.264.47.556.673.848.284.411.537.896.621 1.49a.75.75 0 0 1-1.484.211c-.04-.282-.163-.547-.37-.847a8.456 8.456 0 0 0-.542-.68c-.084-.1-.173-.205-.268-.32C3.201 7.025 2.5 6.227 2.5 5.25 2.5 2.31 4.863 0 8 0s5.5 2.31 5.5 5.25c0 .977-.701 1.775-1.328 2.259-.095.115-.184.22-.268.319-.207.245-.383.453-.541.681-.208.3-.33.565-.37.847a.751.751 0 0 1-1.485-.212c.084-.593.337-1.078.621-1.489.203-.292.45-.584.673-.848.075-.088.147-.173.213-.253.561-.679.985-1.32.985-2.304 0-2.06-1.637-3.75-4-3.75ZM5.75 12h4.5a.75.75 0 0 1 0 1.5h-4.5a.75.75 0 0 1 0-1.5ZM6 15.25a.75.75 0 0 1 .75-.75h2.5a.75.75 0 0 1 0 1.5h-2.5a.75.75 0 0 1-.75-.75Z"></path>
+            </svg>
+            Key Concepts
+        </div>
+        <ul>
+            <li><strong>Cross-Repo Understanding</strong>: Logic split across <code>genomics-pipelines</code> and <code>variant-calling</code>.</li>
+            <li><strong>Configuration Details</strong>: Key options with defaults and descriptions.</li>
+            <li><strong>Related Documentation</strong>: Points to additional resources in Confluence.</li>
+        </ul>
+    </div>
+
+    <h2>Why This is "Feature Set Zero"</h2>
+
+    <p>Before a scientist can <strong>Train</strong> or <strong>Evaluate</strong>, they must <strong>Understand</strong>.</p>
+
+    <table class="comparison-table">
+        <tr>
+            <th>The Old Way</th>
+            <th>The GREMLIN Way</th>
+        </tr>
+        <tr>
+            <td>Grep through 74 repos (100+ matches)</td>
+            <td>Semantic search returns exact file</td>
+        </tr>
+        <tr>
+            <td>Read 3-year-old READMEs</td>
+            <td>Current, authoritative answers</td>
+        </tr>
+        <tr>
+            <td>Ask Slack, wait 4 hours</td>
+            <td>Instant response from knowledge base</td>
+        </tr>
+        <tr>
+            <td>Hope someone knows the answer</td>
+            <td>Indexed institutional memory</td>
+        </tr>
+    </table>
+
+    <div class="stat-highlight">
+        <div class="stat-value">Time to First PR: Weeks → Days</div>
+        <div class="stat-label">Accelerated onboarding through instant knowledge access</div>
+    </div>
+
+    <script>
+        window.addEventListener('message', (event) => {
+            if (event.data && event.data.type === 'scrollToStep') {
+                const stepId = `step-${event.data.step}`;
+                const element = document.getElementById(stepId);
+                if (element) {
+                    element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }
+            }
+        });
+    </script>
+
+</body>
+
+</html>

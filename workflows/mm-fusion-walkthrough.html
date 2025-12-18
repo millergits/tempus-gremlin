@@ -117,7 +117,7 @@
     <p>This demo illustrates how Gremlin accelerates appropriate machine learning experimentation by handling
         infrastructure, data governance, and statistical analysis—allowing researchers to focus on the science.</p>
 
-    <h2>1. Discovery & Feasibility</h2>
+    <h2 id="step-1">1. Discovery & Feasibility</h2>
     <span class="section-desc">Identifying a viable cohort for a Multi-Modal Multiple Myeloma study.</span>
 
     <p><strong>Input</strong>:</p>
@@ -146,7 +146,7 @@
         </ul>
     </div>
 
-    <h2>2. Governance & Reproducibility</h2>
+    <h2 id="step-2">2. Governance & Reproducibility</h2>
     <span class="section-desc">Creating an immutable dataset artifact.</span>
 
     <p><strong>Input</strong>:</p>
@@ -173,7 +173,7 @@
         </ul>
     </div>
 
-    <h2>3. Intelligent Experiment Design</h2>
+    <h2 id="step-3">3. Intelligent Experiment Design</h2>
     <span class="section-desc">Configuring a complex Late Fusion architecture.</span>
 
     <p><strong>Input</strong>:</p>
@@ -201,7 +201,7 @@
         </ul>
     </div>
 
-    <h2>4. Infrastructure Abstraction (Hypernexus)</h2>
+    <h2 id="step-4">4. Infrastructure Abstraction (Hypernexus)</h2>
     <span class="section-desc">Executing the job on specialized hardware.</span>
 
     <p><strong>Input</strong>:</p>
@@ -228,7 +228,7 @@
         </ul>
     </div>
 
-    <h2>5. Automated Analysis (The "Aha!" Moment)</h2>
+    <h2 id="step-5">5. Automated Analysis (The "Aha!" Moment)</h2>
     <span class="section-desc">Interpreting results and finding subtle statistical errors.</span>
 
     <p><strong>Input</strong>:</p>
@@ -258,7 +258,7 @@
         </ol>
     </div>
 
-    <h2>6. Hypothesis Testing (Ablation)</h2>
+    <h2 id="step-6">6. Hypothesis Testing (Ablation)</h2>
     <span class="section-desc">Isolating the signal.</span>
 
     <p><strong>Input</strong>:</p>
@@ -285,7 +285,7 @@
         </ul>
     </div>
 
-    <h2>7. Results Verification</h2>
+    <h2 id="step-7">7. Results Verification</h2>
     <span class="section-desc">Confirming the better path.</span>
 
     <p><strong>Input</strong>:</p>
@@ -316,7 +316,7 @@
         </ul>
     </div>
 
-    <h2>8. One-Click Deployment</h2>
+    <h2 id="step-8">8. One-Click Deployment</h2>
     <span class="section-desc">Shipping the validated model to production.</span>
 
     <p><strong>Input</strong>:</p>
@@ -343,6 +343,19 @@
             <li><strong>Result</strong>: Live endpoint ready for inference in seconds.</li>
         </ul>
     </div>
+
+    <script>
+        // Listen for step sync messages from parent (relayed from CLI demo)
+        window.addEventListener('message', (event) => {
+            if (event.data && event.data.type === 'scrollToStep') {
+                const stepId = `step-${event.data.step}`;
+                const element = document.getElementById(stepId);
+                if (element) {
+                    element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }
+            }
+        });
+    </script>
 
 </body>
 

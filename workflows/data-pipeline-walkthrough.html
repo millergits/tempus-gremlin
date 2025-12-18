@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Data Pipeline Walkthrough</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+            line-height: 1.6;
+            color: #c9d1d9;
+            /* GitHub Dark Text */
+            background-color: #0d1117;
+            /* GitHub Dark Bg */
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+
+        h1,
+        h2,
+        h3 {
+            color: #ffffff;
+            border-bottom: 1px solid #21262d;
+            padding-bottom: .3em;
+        }
+
+        h1 {
+            font-size: 2em;
+            border-bottom: none;
+        }
+
+        h2 {
+            margin-top: 2em;
+        }
+
+        a {
+            color: #58a6ff;
+            text-decoration: none;
+        }
+
+        code {
+            background-color: #161b22;
+            padding: 0.2em 0.4em;
+            border-radius: 6px;
+            font-family: ui-monospace, SFMono-Regular, SF Mono, Menlo, Consolas, Liberation Mono, monospace;
+            font-size: 85%;
+        }
+
+        blockquote {
+            color: #8b949e;
+            border-left: 0.25em solid #30363d;
+            padding: 0 1em;
+            margin: 0;
+        }
+
+        /* Alert Styles */
+        .markdown-alert {
+            padding: 8px 16px;
+            margin-bottom: 16px;
+            border-left: 0.25em solid;
+            border-radius: 6px;
+        }
+
+        .markdown-alert-tip {
+            border-color: #3fb950;
+            /* Green */
+            background-color: rgba(56, 139, 253, 0.1);
+            /* Slight tint option, or keep dark. GitHub uses transparent usually. keeping dark but distinct */
+            background-color: #161b22;
+        }
+
+        .markdown-alert-important {
+            border-color: #a371f7;
+            /* Purple */
+            background-color: #161b22;
+        }
+
+        .markdown-alert-title {
+            display: flex;
+            align-items: center;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .markdown-alert-tip .markdown-alert-title {
+            color: #3fb950;
+        }
+
+        .markdown-alert-important .markdown-alert-title {
+            color: #a371f7;
+        }
+
+        .subtitle {
+            color: #8b949e;
+            font-style: italic;
+            margin-top: -10px;
+            display: block;
+            margin-bottom: 30px;
+        }
+
+        .section-desc {
+            color: #8b949e;
+            font-style: italic;
+            margin-bottom: 16px;
+            display: block;
+        }
+
+        .tbd-notice {
+            background: #d29922;
+            color: #000;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: bold;
+            display: inline-block;
+            margin-bottom: 16px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <h1>Data Pipeline Workflow</h1>
+    <span class="subtitle">Building Clean, Analysis-Ready Datasets</span>
+
+    <div class="tbd-notice">TBD: This workflow contains placeholder content</div>
+
+    <p>This demo illustrates how Gremlin helps researchers discover, unify, and validate data sources—ensuring high-quality datasets for downstream analysis.</p>
+
+    <h2 id="step-1">1. Data Source Discovery</h2>
+    <span class="section-desc">Exploring available data for a research project.</span>
+
+    <p><strong>Input</strong>:</p>
+    <blockquote>
+        "TBD: Show me available data sources for the lung cancer project."
+    </blockquote>
+    <br>
+
+    <div class="markdown-alert markdown-alert-tip">
+        <div class="markdown-alert-title">
+            <svg class="octicon" viewBox="0 0 16 16" version="1.1" width="16" height="16" aria-hidden="true"
+                fill="currentColor" style="margin-right: 8px;">
+                <path
+                    d="M8 1.5c-2.363 0-4 1.69-4 3.75 0 .984.424 1.625.984 2.304l.214.253c.223.264.47.556.673.848.284.411.537.896.621 1.49a.75.75 0 0 1-1.484.211c-.04-.282-.163-.547-.37-.847a8.456 8.456 0 0 0-.542-.68c-.084-.1-.173-.205-.268-.32C3.201 7.025 2.5 6.227 2.5 5.25 2.5 2.31 4.863 0 8 0s5.5 2.31 5.5 5.25c0 .977-.701 1.775-1.328 2.259-.095.115-.184.22-.268.319-.207.245-.383.453-.541.681-.208.3-.33.565-.37.847a.751.751 0 0 1-1.485-.212c.084-.593.337-1.078.621-1.489.203-.292.45-.584.673-.848.075-.088.147-.173.213-.253.561-.679.985-1.32.985-2.304 0-2.06-1.637-3.75-4-3.75ZM5.75 12h4.5a.75.75 0 0 1 0 1.5h-4.5a.75.75 0 0 1 0-1.5ZM6 15.25a.75.75 0 0 1 .75-.75h2.5a.75.75 0 0 1 0 1.5h-2.5a.75.75 0 0 1-.75-.75Z">
+                </path>
+            </svg>
+            Key Concepts
+        </div>
+        <ul>
+            <li><strong>TBD: Data Catalog</strong>: Gremlin provides visibility into all available data sources.</li>
+            <li><strong>TBD: Status Tracking</strong>: Real-time status of data freshness and processing state.</li>
+        </ul>
+    </div>
+
+    <h2 id="step-2">2. Dataset Unification</h2>
+    <span class="section-desc">Combining multiple data sources into a single dataset.</span>
+
+    <p><strong>Input</strong>:</p>
+    <blockquote>
+        "TBD: Yes, create a unified dataset combining clinical and genomic data."
+    </blockquote>
+    <br>
+
+    <div class="markdown-alert markdown-alert-tip">
+        <div class="markdown-alert-title">
+            <svg class="octicon" viewBox="0 0 16 16" version="1.1" width="16" height="16" aria-hidden="true"
+                fill="currentColor" style="margin-right: 8px;">
+                <path
+                    d="M8 1.5c-2.363 0-4 1.69-4 3.75 0 .984.424 1.625.984 2.304l.214.253c.223.264.47.556.673.848.284.411.537.896.621 1.49a.75.75 0 0 1-1.484.211c-.04-.282-.163-.547-.37-.847a8.456 8.456 0 0 0-.542-.68c-.084-.1-.173-.205-.268-.32C3.201 7.025 2.5 6.227 2.5 5.25 2.5 2.31 4.863 0 8 0s5.5 2.31 5.5 5.25c0 .977-.701 1.775-1.328 2.259-.095.115-.184.22-.268.319-.207.245-.383.453-.541.681-.208.3-.33.565-.37.847a.751.751 0 0 1-1.485-.212c.084-.593.337-1.078.621-1.489.203-.292.45-.584.673-.848.075-.088.147-.173.213-.253.561-.679.985-1.32.985-2.304 0-2.06-1.637-3.75-4-3.75ZM5.75 12h4.5a.75.75 0 0 1 0 1.5h-4.5a.75.75 0 0 1 0-1.5ZM6 15.25a.75.75 0 0 1 .75-.75h2.5a.75.75 0 0 1 0 1.5h-2.5a.75.75 0 0 1-.75-.75Z">
+                </path>
+            </svg>
+            Key Concepts
+        </div>
+        <ul>
+            <li><strong>TBD: Schema Validation</strong>: Automatic compatibility checking before joins.</li>
+            <li><strong>TBD: Immutable Artifacts</strong>: Every dataset is pinned with a SHA hash for reproducibility.</li>
+        </ul>
+    </div>
+
+    <h2 id="step-3">3. Data Quality Checks</h2>
+    <span class="section-desc">Validating the unified dataset.</span>
+
+    <p><strong>Input</strong>:</p>
+    <blockquote>
+        "TBD: Run data quality checks on the new dataset."
+    </blockquote>
+    <br>
+
+    <div class="markdown-alert markdown-alert-tip">
+        <div class="markdown-alert-title">
+            <svg class="octicon" viewBox="0 0 16 16" version="1.1" width="16" height="16" aria-hidden="true"
+                fill="currentColor" style="margin-right: 8px;">
+                <path
+                    d="M8 1.5c-2.363 0-4 1.69-4 3.75 0 .984.424 1.625.984 2.304l.214.253c.223.264.47.556.673.848.284.411.537.896.621 1.49a.75.75 0 0 1-1.484.211c-.04-.282-.163-.547-.37-.847a8.456 8.456 0 0 0-.542-.68c-.084-.1-.173-.205-.268-.32C3.201 7.025 2.5 6.227 2.5 5.25 2.5 2.31 4.863 0 8 0s5.5 2.31 5.5 5.25c0 .977-.701 1.775-1.328 2.259-.095.115-.184.22-.268.319-.207.245-.383.453-.541.681-.208.3-.33.565-.37.847a.751.751 0 0 1-1.485-.212c.084-.593.337-1.078.621-1.489.203-.292.45-.584.673-.848.075-.088.147-.173.213-.253.561-.679.985-1.32.985-2.304 0-2.06-1.637-3.75-4-3.75ZM5.75 12h4.5a.75.75 0 0 1 0 1.5h-4.5a.75.75 0 0 1 0-1.5ZM6 15.25a.75.75 0 0 1 .75-.75h2.5a.75.75 0 0 1 0 1.5h-2.5a.75.75 0 0 1-.75-.75Z">
+                </path>
+            </svg>
+            Key Concepts
+        </div>
+        <ul>
+            <li><strong>TBD: Automated Checks</strong>: Missing values, duplicates, schema validation, outliers.</li>
+            <li><strong>TBD: Proactive Warnings</strong>: Issues are flagged before they impact analysis.</li>
+        </ul>
+    </div>
+
+    <h2 id="step-4">4. Outlier Investigation</h2>
+    <span class="section-desc">Examining flagged records.</span>
+
+    <p><strong>Input</strong>:</p>
+    <blockquote>
+        "TBD: Show me the flagged outlier records."
+    </blockquote>
+    <br>
+
+    <div class="markdown-alert markdown-alert-important">
+        <div class="markdown-alert-title">
+            <svg class="octicon" viewBox="0 0 16 16" version="1.1" width="16" height="16" aria-hidden="true"
+                fill="currentColor" style="margin-right: 8px;">
+                <path
+                    d="M0 1.75C0 .784.784 0 1.75 0h12.5C15.216 0 16 .784 16 1.75v9.5A1.75 1.75 0 0 1 14.25 13H8.06l-2.573 2.573A1.458 1.458 0 0 1 3 14.543V13H1.75A1.75 1.75 0 0 1 0 11.25Zm1.75-.25a.25.25 0 0 0-.25.25v9.5c0 .138.112.25.25.25h2a.75.75 0 0 1 .75.75v2.19l2.72-2.72a.75.75 0 0 1 .53-.22h6.5a.25.25 0 0 0 .25-.25v-9.5a.25.25 0 0 0-.25-.25Zm7 2.25v2.5a.75.75 0 0 1-1.5 0v-2.5a.75.75 0 0 1 1.5 0ZM9 9a1 1 0 1 1-2 0 1 1 0 0 1 2 0Z">
+                </path>
+            </svg>
+            TBD: Data Quality Insight
+        </div>
+        <p>TBD: Gremlin identifies specific data issues with actionable context:</p>
+        <ol>
+            <li><strong>Invalid Ages</strong>: Values outside biological range</li>
+            <li><strong>Negative Measurements</strong>: Physical impossibilities</li>
+            <li><strong>Temporal Anomalies</strong>: Future dates in historical data</li>
+        </ol>
+    </div>
+
+    <h2 id="step-5">5. Data Cleaning</h2>
+    <span class="section-desc">Creating a cleaned dataset version.</span>
+
+    <p><strong>Input</strong>:</p>
+    <blockquote>
+        "TBD: Yes, exclude them and create a cleaned version."
+    </blockquote>
+    <br>
+
+    <div class="markdown-alert markdown-alert-tip">
+        <div class="markdown-alert-title">
+            <svg class="octicon" viewBox="0 0 16 16" version="1.1" width="16" height="16" aria-hidden="true"
+                fill="currentColor" style="margin-right: 8px;">
+                <path
+                    d="M8 1.5c-2.363 0-4 1.69-4 3.75 0 .984.424 1.625.984 2.304l.214.253c.223.264.47.556.673.848.284.411.537.896.621 1.49a.75.75 0 0 1-1.484.211c-.04-.282-.163-.547-.37-.847a8.456 8.456 0 0 0-.542-.68c-.084-.1-.173-.205-.268-.32C3.201 7.025 2.5 6.227 2.5 5.25 2.5 2.31 4.863 0 8 0s5.5 2.31 5.5 5.25c0 .977-.701 1.775-1.328 2.259-.095.115-.184.22-.268.319-.207.245-.383.453-.541.681-.208.3-.33.565-.37.847a.751.751 0 0 1-1.485-.212c.084-.593.337-1.078.621-1.489.203-.292.45-.584.673-.848.075-.088.147-.173.213-.253.561-.679.985-1.32.985-2.304 0-2.06-1.637-3.75-4-3.75ZM5.75 12h4.5a.75.75 0 0 1 0 1.5h-4.5a.75.75 0 0 1 0-1.5ZM6 15.25a.75.75 0 0 1 .75-.75h2.5a.75.75 0 0 1 0 1.5h-2.5a.75.75 0 0 1-.75-.75Z">
+                </path>
+            </svg>
+            Key Concepts
+        </div>
+        <ul>
+            <li><strong>TBD: Lineage Tracking</strong>: Full history of data transformations.</li>
+            <li><strong>TBD: Non-Destructive</strong>: Original data preserved, cleaned version created separately.</li>
+            <li><strong>TBD: Ready for Analysis</strong>: Clean dataset can now be used for modeling.</li>
+        </ul>
+    </div>
+
+    <script>
+        // Listen for step sync messages from parent (relayed from CLI demo)
+        window.addEventListener('message', (event) => {
+            if (event.data && event.data.type === 'scrollToStep') {
+                const stepId = `step-${event.data.step}`;
+                const element = document.getElementById(stepId);
+                if (element) {
+                    element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }
+            }
+        });
+    </script>
+
+</body>
+
+</html>

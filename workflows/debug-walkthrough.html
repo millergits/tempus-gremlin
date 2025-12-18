@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Debug & Rescue - Walkthrough</title>
+    <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif; line-height: 1.6; color: #c9d1d9; background-color: #0d1117; max-width: 800px; margin: 0 auto; padding: 40px 20px; }
+        h1, h2, h3 { color: #ffffff; border-bottom: 1px solid #21262d; padding-bottom: .3em; }
+        h1 { font-size: 2em; border-bottom: none; }
+        h2 { margin-top: 2em; }
+        code { background-color: #161b22; padding: 0.2em 0.4em; border-radius: 6px; font-family: ui-monospace, SFMono-Regular, SF Mono, Menlo, Consolas, Liberation Mono, monospace; font-size: 85%; }
+        blockquote { color: #8b949e; border-left: 0.25em solid #30363d; padding: 0 1em; margin: 0; }
+        .markdown-alert { padding: 8px 16px; margin-bottom: 16px; border-left: 0.25em solid; border-radius: 6px; }
+        .markdown-alert-tip { border-color: #3fb950; background-color: #161b22; }
+        .markdown-alert-important { border-color: #a371f7; background-color: #161b22; }
+        .markdown-alert-warning { border-color: #d29922; background-color: #161b22; }
+        .markdown-alert-title { display: flex; align-items: center; font-weight: 600; margin-bottom: 8px; }
+        .markdown-alert-tip .markdown-alert-title { color: #3fb950; }
+        .markdown-alert-important .markdown-alert-title { color: #a371f7; }
+        .markdown-alert-warning .markdown-alert-title { color: #d29922; }
+        .subtitle { color: #8b949e; font-style: italic; margin-top: -10px; display: block; margin-bottom: 30px; }
+        .section-desc { color: #8b949e; font-style: italic; margin-bottom: 16px; display: block; }
+        .stat-highlight { background: linear-gradient(90deg, rgba(63, 185, 80, 0.1), transparent); border-left: 3px solid #3fb950; padding: 12px 16px; margin: 16px 0; }
+        .stat-value { font-size: 1.5em; font-weight: bold; color: #3fb950; }
+        .stat-label { color: #8b949e; font-size: 0.9em; }
+        .comparison-table { width: 100%; border-collapse: collapse; margin: 1rem 0; }
+        .comparison-table th, .comparison-table td { border: 1px solid #30363d; padding: 8px 12px; text-align: left; }
+        .comparison-table th { background-color: #161b22; color: #8b949e; }
+    </style>
+</head>
+
+<body>
+
+    <h1>The "Debug & Rescue" Mission</h1>
+    <span class="subtitle">Diagnose, fix, and resume crashed training runs</span>
+
+    <p>This demo illustrates how GREMLIN transforms debugging from a forensic exercise into a guided recovery process.</p>
+
+    <div class="stat-highlight">
+        <div class="stat-value">$5,000 Saved</div>
+        <div class="stat-label">Per avoided restart from Epoch 0</div>
+    </div>
+
+    <h2 id="step-1">1. The Crash Report: "Forensic Analysis"</h2>
+    <span class="section-desc">Understanding why a 128-GPU job crashed overnight.</span>
+
+    <p><strong>Input</strong>:</p>
+    <blockquote>"Why did job 'job-fusion-xl-v2' fail?"</blockquote>
+    <br>
+
+    <div class="markdown-alert markdown-alert-important">
+        <div class="markdown-alert-title">
+            <svg class="octicon" viewBox="0 0 16 16" version="1.1" width="16" height="16" fill="currentColor" style="margin-right: 8px;">
+                <path d="M0 1.75C0 .784.784 0 1.75 0h12.5C15.216 0 16 .784 16 1.75v9.5A1.75 1.75 0 0 1 14.25 13H8.06l-2.573 2.573A1.458 1.458 0 0 1 3 14.543V13H1.75A1.75 1.75 0 0 1 0 11.25Zm1.75-.25a.25.25 0 0 0-.25.25v9.5c0 .138.112.25.25.25h2a.75.75 0 0 1 .75.75v2.19l2.72-2.72a.75.75 0 0 1 .53-.22h6.5a.25.25 0 0 0 .25-.25v-9.5a.25.25 0 0 0-.25-.25Zm7 2.25v2.5a.75.75 0 0 1-1.5 0v-2.5a.75.75 0 0 1 1.5 0ZM9 9a1 1 0 1 1-2 0 1 1 0 0 1 2 0Z"></path>
+            </svg>
+            Insight: No More Log Archaeology
+        </div>
+        <p>Instead of scrolling through 10,000 lines of logs, GREMLIN:</p>
+        <ul>
+            <li><strong>Parses Stack Traces</strong>: Identifies the exact error type (OOM)</li>
+            <li><strong>Correlates Events</strong>: Links to node heartbeats from Hypernexus</li>
+            <li><strong>Diagnoses Root Cause</strong>: Pinpoints the specific operation (contrastive_loss) and location (Rank 7)</li>
+            <li><strong>Rules Out Hardware</strong>: Confirms all nodes are healthy</li>
+        </ul>
+    </div>
+
+    <h2 id="step-2">2. The Fix & Resume: "The Save"</h2>
+    <span class="section-desc">Recovering without losing progress.</span>
+
+    <p><strong>Input</strong>:</p>
+    <blockquote>"Fix the OOM and resume training."</blockquote>
+    <br>
+
+    <div class="markdown-alert markdown-alert-tip">
+        <div class="markdown-alert-title">
+            <svg class="octicon" viewBox="0 0 16 16" version="1.1" width="16" height="16" fill="currentColor" style="margin-right: 8px;">
+                <path d="M8 1.5c-2.363 0-4 1.69-4 3.75 0 .984.424 1.625.984 2.304l.214.253c.223.264.47.556.673.848.284.411.537.896.621 1.49a.75.75 0 0 1-1.484.211c-.04-.282-.163-.547-.37-.847a8.456 8.456 0 0 0-.542-.68c-.084-.1-.173-.205-.268-.32C3.201 7.025 2.5 6.227 2.5 5.25 2.5 2.31 4.863 0 8 0s5.5 2.31 5.5 5.25c0 .977-.701 1.775-1.328 2.259-.095.115-.184.22-.268.319-.207.245-.383.453-.541.681-.208.3-.33.565-.37.847a.751.751 0 0 1-1.485-.212c.084-.593.337-1.078.621-1.489.203-.292.45-.584.673-.848.075-.088.147-.173.213-.253.561-.679.985-1.32.985-2.304 0-2.06-1.637-3.75-4-3.75ZM5.75 12h4.5a.75.75 0 0 1 0 1.5h-4.5a.75.75 0 0 1 0-1.5ZM6 15.25a.75.75 0 0 1 .75-.75h2.5a.75.75 0 0 1 0 1.5h-2.5a.75.75 0 0 1-.75-.75Z"></path>
+            </svg>
+            Key Concepts
+        </div>
+        <ul>
+            <li><strong>Smart Fix Suggestion</strong>: GREMLIN knows to reduce val_batch_size, not training batch size.</li>
+            <li><strong>Checkpoint Discovery</strong>: Finds the latest valid checkpoint in Atlas (step 4,500).</li>
+            <li><strong>Complete Action Plan</strong>: Clone, patch, and resubmit in one flow.</li>
+        </ul>
+    </div>
+
+    <h2 id="step-3">3. Execute Recovery</h2>
+    <span class="section-desc">One-click resume from checkpoint.</span>
+
+    <p><strong>Input</strong>:</p>
+    <blockquote>"Y" (Execute fix)</blockquote>
+    <br>
+
+    <div class="markdown-alert markdown-alert-warning">
+        <div class="markdown-alert-title">
+            <svg class="octicon" viewBox="0 0 16 16" version="1.1" width="16" height="16" fill="currentColor" style="margin-right: 8px;">
+                <path d="M6.457 1.047c.659-1.234 2.427-1.234 3.086 0l6.082 11.378A1.75 1.75 0 0 1 14.082 15H1.918a1.75 1.75 0 0 1-1.543-2.575Zm1.763.707a.25.25 0 0 0-.44 0L1.698 13.132a.25.25 0 0 0 .22.368h12.164a.25.25 0 0 0 .22-.368Zm.53 3.996v2.5a.75.75 0 0 1-1.5 0v-2.5a.75.75 0 0 1 1.5 0ZM9 11a1 1 0 1 1-2 0 1 1 0 0 1 2 0Z"></path>
+            </svg>
+            $5K in Compute Saved
+        </div>
+        <p>Without GREMLIN:</p>
+        <ul>
+            <li>Manually edit YAML config</li>
+            <li>Hunt for GCS checkpoint path</li>
+            <li>Risk typos in resume_from field</li>
+            <li>Possibly restart from Epoch 0</li>
+        </ul>
+        <p><strong>With GREMLIN</strong>: Resume from step 4,500 with validated config changes.</p>
+    </div>
+
+    <h2 id="step-4">4. Proactive Monitoring: "The Watch"</h2>
+    <span class="section-desc">Setting up alerts to prevent future surprises.</span>
+
+    <p><strong>Input</strong>:</p>
+    <blockquote>"Monitor this run and alert me if anything looks wrong."</blockquote>
+    <br>
+
+    <div class="markdown-alert markdown-alert-tip">
+        <div class="markdown-alert-title">
+            <svg class="octicon" viewBox="0 0 16 16" version="1.1" width="16" height="16" fill="currentColor" style="margin-right: 8px;">
+                <path d="M8 1.5c-2.363 0-4 1.69-4 3.75 0 .984.424 1.625.984 2.304l.214.253c.223.264.47.556.673.848.284.411.537.896.621 1.49a.75.75 0 0 1-1.484.211c-.04-.282-.163-.547-.37-.847a8.456 8.456 0 0 0-.542-.68c-.084-.1-.173-.205-.268-.32C3.201 7.025 2.5 6.227 2.5 5.25 2.5 2.31 4.863 0 8 0s5.5 2.31 5.5 5.25c0 .977-.701 1.775-1.328 2.259-.095.115-.184.22-.268.319-.207.245-.383.453-.541.681-.208.3-.33.565-.37.847a.751.751 0 0 1-1.485-.212c.084-.593.337-1.078.621-1.489.203-.292.45-.584.673-.848.075-.088.147-.173.213-.253.561-.679.985-1.32.985-2.304 0-2.06-1.637-3.75-4-3.75ZM5.75 12h4.5a.75.75 0 0 1 0 1.5h-4.5a.75.75 0 0 1 0-1.5ZM6 15.25a.75.75 0 0 1 .75-.75h2.5a.75.75 0 0 1 0 1.5h-2.5a.75.75 0 0 1-.75-.75Z"></path>
+            </svg>
+            Key Concepts
+        </div>
+        <ul>
+            <li><strong>Smart Thresholds</strong>: 2x moving average for loss spikes, not absolute values.</li>
+            <li><strong>Tiered Alerts</strong>: Warnings vs. critical alerts depending on severity.</li>
+            <li><strong>Slack Integration</strong>: Notifications go directly to the scientist.</li>
+        </ul>
+    </div>
+
+    <h2 id="step-5">5. Health Check</h2>
+    <span class="section-desc">Verifying the resumed job is healthy.</span>
+
+    <p><strong>Input</strong>:</p>
+    <blockquote>"How is the resumed job doing?"</blockquote>
+    <br>
+
+    <div class="markdown-alert markdown-alert-tip">
+        <div class="markdown-alert-title">
+            <svg class="octicon" viewBox="0 0 16 16" version="1.1" width="16" height="16" fill="currentColor" style="margin-right: 8px;">
+                <path d="M8 1.5c-2.363 0-4 1.69-4 3.75 0 .984.424 1.625.984 2.304l.214.253c.223.264.47.556.673.848.284.411.537.896.621 1.49a.75.75 0 0 1-1.484.211c-.04-.282-.163-.547-.37-.847a8.456 8.456 0 0 0-.542-.68c-.084-.1-.173-.205-.268-.32C3.201 7.025 2.5 6.227 2.5 5.25 2.5 2.31 4.863 0 8 0s5.5 2.31 5.5 5.25c0 .977-.701 1.775-1.328 2.259-.095.115-.184.22-.268.319-.207.245-.383.453-.541.681-.208.3-.33.565-.37.847a.751.751 0 0 1-1.485-.212c.084-.593.337-1.078.621-1.489.203-.292.45-.584.673-.848.075-.088.147-.173.213-.253.561-.679.985-1.32.985-2.304 0-2.06-1.637-3.75-4-3.75ZM5.75 12h4.5a.75.75 0 0 1 0 1.5h-4.5a.75.75 0 0 1 0-1.5ZM6 15.25a.75.75 0 0 1 .75-.75h2.5a.75.75 0 0 1 0 1.5h-2.5a.75.75 0 0 1-.75-.75Z"></path>
+            </svg>
+            Key Concepts
+        </div>
+        <ul>
+            <li><strong>Expected vs. Actual</strong>: Compare metrics against historical baselines.</li>
+            <li><strong>At-a-Glance Status</strong>: Green/yellow/red indicators for quick assessment.</li>
+            <li><strong>Completion Estimate</strong>: Know exactly when the job will finish.</li>
+        </ul>
+    </div>
+
+    <h2 id="step-6">6. Knowledge Base: Common Errors</h2>
+    <span class="section-desc">Learning Tempus-specific failure patterns.</span>
+
+    <p><strong>Input</strong>:</p>
+    <blockquote>"What common errors should I watch out for on Hypernexus?"</blockquote>
+    <br>
+
+    <div class="markdown-alert markdown-alert-important">
+        <div class="markdown-alert-title">
+            <svg class="octicon" viewBox="0 0 16 16" version="1.1" width="16" height="16" fill="currentColor" style="margin-right: 8px;">
+                <path d="M0 1.75C0 .784.784 0 1.75 0h12.5C15.216 0 16 .784 16 1.75v9.5A1.75 1.75 0 0 1 14.25 13H8.06l-2.573 2.573A1.458 1.458 0 0 1 3 14.543V13H1.75A1.75 1.75 0 0 1 0 11.25Zm1.75-.25a.25.25 0 0 0-.25.25v9.5c0 .138.112.25.25.25h2a.75.75 0 0 1 .75.75v2.19l2.72-2.72a.75.75 0 0 1 .53-.22h6.5a.25.25 0 0 0 .25-.25v-9.5a.25.25 0 0 0-.25-.25Zm7 2.25v2.5a.75.75 0 0 1-1.5 0v-2.5a.75.75 0 0 1 1.5 0ZM9 9a1 1 0 1 1-2 0 1 1 0 0 1 2 0Z"></path>
+            </svg>
+            Insight: Tempus-Specific, Not StackOverflow
+        </div>
+        <p>Generic error messages get Tempus-specific solutions:</p>
+        <ul>
+            <li><strong>NCCL timeout</strong>: Knows Hypernexus uses TCP/IP (no RDMA)</li>
+            <li><strong>Ray actor died</strong>: Knows about Spot instance patterns</li>
+            <li><strong>gcsfuse errors</strong>: Knows internal caching behavior</li>
+        </ul>
+    </div>
+
+    <h2>The Value of Intelligent Debugging</h2>
+
+    <table class="comparison-table">
+        <tr>
+            <th>Without GREMLIN</th>
+            <th>With GREMLIN</th>
+        </tr>
+        <tr>
+            <td>kubectl logs (endless scrolling)</td>
+            <td>Root cause in seconds</td>
+        </tr>
+        <tr>
+            <td>Guess: Hardware or software?</td>
+            <td>Definitive diagnosis</td>
+        </tr>
+        <tr>
+            <td>Manual checkpoint path hunting</td>
+            <td>Atlas query finds latest valid</td>
+        </tr>
+        <tr>
+            <td>Crude PASS/FAIL alerts</td>
+            <td>Intelligent anomaly detection</td>
+        </tr>
+        <tr>
+            <td>Generic StackOverflow answers</td>
+            <td>Tempus-specific solutions</td>
+        </tr>
+    </table>
+
+    <div class="stat-highlight">
+        <div class="stat-value">Hours → Minutes</div>
+        <div class="stat-label">Time from crash to resumed training</div>
+    </div>
+
+    <script>
+        window.addEventListener('message', (event) => {
+            if (event.data && event.data.type === 'scrollToStep') {
+                const stepId = `step-${event.data.step}`;
+                const element = document.getElementById(stepId);
+                if (element) { element.scrollIntoView({ behavior: 'smooth', block: 'start' }); }
+            }
+        });
+    </script>
+
+</body>
+
+</html>

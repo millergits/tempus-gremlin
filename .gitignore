@@ -4,3 +4,4 @@ encrypted/
 .DS_Store
 *.log
 .surge
+.domain

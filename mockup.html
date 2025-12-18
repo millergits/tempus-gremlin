@@ -1,0 +1,1592 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gremlin Mockup</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;600&display=swap');
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #050505;
+            height: 100vh;
+            width: 100vw;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            font-family: 'Fira Code', monospace;
+        }
+
+        /* Navigation Bar */
+        .nav-bar {
+            background: #0d1117;
+            border-bottom: 1px solid #30363d;
+            padding: 12px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 20px;
+        }
+
+        .nav-brand {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .nav-brand-icon {
+            color: #4ade80;
+            font-size: 20px;
+        }
+
+        .nav-brand-text {
+            color: #4ade80;
+            font-size: 14px;
+            font-weight: bold;
+            letter-spacing: 1px;
+        }
+
+        .version-badge {
+            color: #6e7681;
+            font-size: 10px;
+            font-weight: normal;
+            margin-left: 8px;
+        }
+
+        .nav-controls {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .nav-label {
+            color: #8b949e;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .workflow-select {
+            background: #161b22;
+            border: 1px solid #30363d;
+            border-radius: 6px;
+            color: #c9d1d9;
+            font-family: 'Fira Code', monospace;
+            font-size: 13px;
+            padding: 8px 32px 8px 12px;
+            cursor: pointer;
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12' fill='%238b949e'%3E%3Cpath d='M2 4l4 4 4-4'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 10px center;
+            min-width: 280px;
+        }
+
+        .workflow-select:hover {
+            border-color: #4ade80;
+        }
+
+        .workflow-select:focus {
+            outline: none;
+            border-color: #4ade80;
+            box-shadow: 0 0 0 2px rgba(74, 222, 128, 0.2);
+        }
+
+        .workflow-select option {
+            background: #161b22;
+            color: #c9d1d9;
+            padding: 8px;
+        }
+
+        .workflow-badge {
+            background: #238636;
+            color: #fff;
+            font-size: 10px;
+            padding: 3px 8px;
+            border-radius: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            display: flex;
+            overflow: hidden;
+        }
+
+        .panel {
+            flex: 1;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .panel-header {
+            background: #0d1117;
+            color: #4ade80;
+            padding: 8px 16px;
+            font-family: 'Fira Code', monospace;
+            font-size: 12px;
+            font-weight: bold;
+            border-bottom: 1px solid #30363d;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .panel-header-icon {
+            opacity: 0.7;
+        }
+
+        .panel:first-child {
+            border-right: 2px solid #30363d;
+        }
+
+        iframe {
+            flex: 1;
+            width: 100%;
+            border: none;
+            background: #050505;
+        }
+
+        /* Loading State */
+        .loading-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(5, 5, 5, 0.9);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 100;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+        }
+
+        .loading-overlay.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .loading-spinner {
+            color: #4ade80;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .loading-spinner::before {
+            content: '';
+            width: 20px;
+            height: 20px;
+            border: 2px solid #30363d;
+            border-top-color: #4ade80;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        /* Keyboard hint */
+        .keyboard-hint {
+            color: #6e7681;
+            font-size: 11px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .keyboard-hint kbd {
+            background: #21262d;
+            border: 1px solid #30363d;
+            border-radius: 4px;
+            padding: 2px 6px;
+            font-family: 'Fira Code', monospace;
+            font-size: 10px;
+        }
+
+        /* Share Button */
+        .share-btn {
+            background: #21262d;
+            border: 1px solid #30363d;
+            border-radius: 6px;
+            color: #c9d1d9;
+            font-family: 'Fira Code', monospace;
+            font-size: 12px;
+            padding: 8px 14px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.2s ease;
+        }
+
+        .share-btn:hover {
+            background: #30363d;
+            border-color: #4ade80;
+            color: #4ade80;
+        }
+
+        .share-btn:active {
+            transform: scale(0.98);
+        }
+
+        .share-btn.copied {
+            background: #238636;
+            border-color: #238636;
+            color: #fff;
+        }
+
+        .share-btn svg {
+            width: 14px;
+            height: 14px;
+            fill: currentColor;
+        }
+
+        /* Reset Button (icon only, next to workflow select) */
+        .reset-btn {
+            background: transparent;
+            border: 1px solid #30363d;
+            border-radius: 6px;
+            color: #8b949e;
+            padding: 6px 8px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+        }
+
+        .reset-btn:hover {
+            background: #21262d;
+            border-color: #f85149;
+            color: #f85149;
+        }
+
+        .reset-btn:active {
+            transform: scale(0.98);
+        }
+
+        .reset-btn svg {
+            width: 14px;
+            height: 14px;
+            fill: currentColor;
+        }
+
+        /* Share Workflow Button (link icon) */
+        #share-workflow-btn:hover {
+            border-color: #4ade80;
+            color: #4ade80;
+        }
+
+        /* Docs Button */
+        .docs-btn {
+            background: #21262d;
+            border: 1px solid #30363d;
+            border-radius: 6px;
+            color: #c9d1d9;
+            font-family: 'Fira Code', monospace;
+            font-size: 12px;
+            padding: 8px 14px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.2s ease;
+            text-decoration: none;
+        }
+
+        .docs-btn:hover {
+            background: #30363d;
+            border-color: #58a6ff;
+            color: #58a6ff;
+        }
+
+        .docs-btn:active {
+            transform: scale(0.98);
+        }
+
+        .docs-btn svg {
+            width: 14px;
+            height: 14px;
+            fill: currentColor;
+        }
+
+        /* Toast notification */
+        .toast {
+            position: fixed;
+            bottom: 24px;
+            left: 50%;
+            transform: translateX(-50%) translateY(100px);
+            background: #238636;
+            color: #fff;
+            padding: 12px 20px;
+            border-radius: 8px;
+            font-size: 13px;
+            font-family: 'Fira Code', monospace;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+            opacity: 0;
+            transition: all 0.3s ease;
+            z-index: 1000;
+        }
+
+        .toast.show {
+            transform: translateX(-50%) translateY(0);
+            opacity: 1;
+        }
+
+        .toast svg {
+            width: 16px;
+            height: 16px;
+            fill: currentColor;
+        }
+
+        .nav-actions {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        /* Share Modal */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.7);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.2s ease;
+        }
+
+        .modal-overlay.show {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .modal {
+            background: #161b22;
+            border: 1px solid #30363d;
+            border-radius: 12px;
+            padding: 24px;
+            max-width: 440px;
+            width: 90%;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+            transform: scale(0.95);
+            transition: transform 0.2s ease;
+        }
+
+        .modal-overlay.show .modal {
+            transform: scale(1);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .modal-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #fff;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .modal-title svg {
+            width: 18px;
+            height: 18px;
+            fill: #4ade80;
+        }
+
+        .modal-close {
+            background: transparent;
+            border: none;
+            color: #8b949e;
+            cursor: pointer;
+            padding: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 4px;
+            transition: all 0.2s ease;
+        }
+
+        .modal-close:hover {
+            background: #21262d;
+            color: #fff;
+        }
+
+        .modal-close svg {
+            width: 16px;
+            height: 16px;
+            fill: currentColor;
+        }
+
+        .share-field {
+            margin-bottom: 16px;
+        }
+
+        .share-field-label {
+            font-size: 11px;
+            text-transform: uppercase;
+            color: #8b949e;
+            margin-bottom: 6px;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+        }
+
+        .share-field-row {
+            display: flex;
+            gap: 8px;
+        }
+
+        .share-field-input {
+            flex: 1;
+            background: #0d1117;
+            border: 1px solid #30363d;
+            border-radius: 6px;
+            padding: 10px 12px;
+            color: #c9d1d9;
+            font-family: 'Fira Code', monospace;
+            font-size: 13px;
+            outline: none;
+        }
+
+        .share-field-input:focus {
+            border-color: #58a6ff;
+        }
+
+        .share-field-input.password {
+            max-width: 100px;
+            text-align: center;
+            font-weight: 600;
+            color: #4ade80;
+        }
+
+        .copy-btn {
+            background: #21262d;
+            border: 1px solid #30363d;
+            border-radius: 6px;
+            color: #c9d1d9;
+            padding: 10px 14px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 12px;
+            font-family: 'Fira Code', monospace;
+            transition: all 0.2s ease;
+        }
+
+        .copy-btn:hover {
+            background: #30363d;
+            border-color: #4ade80;
+            color: #4ade80;
+        }
+
+        .copy-btn.copied {
+            background: #238636;
+            border-color: #238636;
+            color: #fff;
+        }
+
+        .copy-btn svg {
+            width: 14px;
+            height: 14px;
+            fill: currentColor;
+        }
+
+        .modal-footer {
+            margin-top: 20px;
+            padding-top: 16px;
+            border-top: 1px solid #30363d;
+        }
+
+        .copy-all-btn {
+            width: 100%;
+            background: #238636;
+            border: none;
+            border-radius: 6px;
+            color: #fff;
+            padding: 12px 16px;
+            cursor: pointer;
+            font-size: 13px;
+            font-family: 'Fira Code', monospace;
+            font-weight: 600;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .copy-all-btn:hover {
+            background: #2ea043;
+        }
+
+        .copy-all-btn svg {
+            width: 16px;
+            height: 16px;
+            fill: currentColor;
+        }
+
+        /* Nav Arrow Buttons */
+        .nav-arrow {
+            background: transparent;
+            border: 1px solid #30363d;
+            border-radius: 6px;
+            color: #8b949e;
+            padding: 6px 10px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+        }
+
+        .nav-arrow:hover:not(:disabled) {
+            background: #21262d;
+            border-color: #4ade80;
+            color: #4ade80;
+        }
+
+        .nav-arrow:disabled {
+            opacity: 0.3;
+            cursor: not-allowed;
+        }
+
+        .nav-arrow svg {
+            width: 14px;
+            height: 14px;
+            fill: currentColor;
+        }
+
+        .workflow-nav {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .workflow-progress {
+            color: #6e7681;
+            font-size: 11px;
+            min-width: 50px;
+            text-align: center;
+        }
+
+        /* Welcome Modal */
+        .welcome-modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.85);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 3000;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .welcome-modal-overlay.show {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .welcome-modal {
+            background: #161b22;
+            border: 1px solid #30363d;
+            border-radius: 16px;
+            padding: 32px;
+            max-width: 520px;
+            width: 90%;
+            box-shadow: 0 16px 64px rgba(0, 0, 0, 0.6);
+            transform: scale(0.9) translateY(20px);
+            transition: transform 0.3s ease;
+        }
+
+        .welcome-modal-overlay.show .welcome-modal {
+            transform: scale(1) translateY(0);
+        }
+
+        .welcome-header {
+            text-align: center;
+            margin-bottom: 24px;
+        }
+
+        .welcome-icon {
+            font-size: 48px;
+            margin-bottom: 16px;
+        }
+
+        .welcome-title {
+            font-size: 24px;
+            font-weight: 700;
+            color: #fff;
+            margin-bottom: 8px;
+        }
+
+        .welcome-subtitle {
+            color: #8b949e;
+            font-size: 14px;
+        }
+
+        .welcome-instructions {
+            background: #0d1117;
+            border: 1px solid #30363d;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 24px;
+        }
+
+        .instruction-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 16px;
+            padding: 12px 0;
+            border-bottom: 1px solid #21262d;
+        }
+
+        .instruction-item:last-child {
+            border-bottom: none;
+            padding-bottom: 0;
+        }
+
+        .instruction-item:first-child {
+            padding-top: 0;
+        }
+
+        .instruction-key {
+            background: #238636;
+            color: #fff;
+            font-size: 11px;
+            font-weight: 700;
+            padding: 6px 12px;
+            border-radius: 6px;
+            min-width: 60px;
+            text-align: center;
+            font-family: 'Fira Code', monospace;
+        }
+
+        .instruction-text {
+            flex: 1;
+        }
+
+        .instruction-text strong {
+            color: #fff;
+            display: block;
+            margin-bottom: 4px;
+        }
+
+        .instruction-text span {
+            color: #8b949e;
+            font-size: 13px;
+        }
+
+        .welcome-start-btn {
+            width: 100%;
+            background: linear-gradient(135deg, #238636 0%, #2ea043 100%);
+            border: none;
+            border-radius: 10px;
+            color: #fff;
+            padding: 16px 24px;
+            cursor: pointer;
+            font-size: 15px;
+            font-family: 'Fira Code', monospace;
+            font-weight: 600;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .welcome-start-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(35, 134, 54, 0.4);
+        }
+
+        .welcome-start-btn svg {
+            width: 18px;
+            height: 18px;
+            fill: currentColor;
+        }
+
+        /* Completion Modal */
+        .completion-modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.85);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 3000;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .completion-modal-overlay.show {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .completion-modal {
+            background: #161b22;
+            border: 1px solid #30363d;
+            border-radius: 16px;
+            padding: 32px;
+            max-width: 480px;
+            width: 90%;
+            box-shadow: 0 16px 64px rgba(0, 0, 0, 0.6);
+            transform: scale(0.9) translateY(20px);
+            transition: transform 0.3s ease;
+            text-align: center;
+        }
+
+        .completion-modal-overlay.show .completion-modal {
+            transform: scale(1) translateY(0);
+        }
+
+        .completion-icon {
+            font-size: 56px;
+            margin-bottom: 16px;
+        }
+
+        .completion-title {
+            font-size: 22px;
+            font-weight: 700;
+            color: #fff;
+            margin-bottom: 8px;
+        }
+
+        .completion-workflow-name {
+            color: #4ade80;
+            font-size: 14px;
+            margin-bottom: 24px;
+        }
+
+        .completion-buttons {
+            display: flex;
+            gap: 12px;
+        }
+
+        .completion-btn {
+            flex: 1;
+            padding: 14px 20px;
+            border-radius: 10px;
+            font-size: 14px;
+            font-family: 'Fira Code', monospace;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .completion-btn svg {
+            width: 16px;
+            height: 16px;
+            fill: currentColor;
+        }
+
+        .completion-btn.secondary {
+            background: #21262d;
+            border: 1px solid #30363d;
+            color: #c9d1d9;
+        }
+
+        .completion-btn.secondary:hover {
+            background: #30363d;
+            border-color: #8b949e;
+        }
+
+        .completion-btn.primary {
+            background: linear-gradient(135deg, #238636 0%, #2ea043 100%);
+            border: none;
+            color: #fff;
+        }
+
+        .completion-btn.primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(35, 134, 54, 0.4);
+        }
+
+        .completion-btn.primary:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .completion-progress {
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid #30363d;
+        }
+
+        .completion-progress-text {
+            color: #8b949e;
+            font-size: 12px;
+            margin-bottom: 10px;
+        }
+
+        .completion-progress-bar {
+            height: 6px;
+            background: #21262d;
+            border-radius: 3px;
+            overflow: hidden;
+        }
+
+        .completion-progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #238636, #4ade80);
+            border-radius: 3px;
+            transition: width 0.3s ease;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Navigation Bar -->
+    <nav class="nav-bar">
+        <div class="nav-brand">
+            <span class="nav-brand-icon">&#9881;</span>
+            <span class="nav-brand-text">GREMLIN MOCKUP</span>
+            <span class="version-badge">v2.4.0</span>
+        </div>
+
+        <div class="nav-controls">
+            <div class="workflow-nav">
+                <button class="nav-arrow" id="prev-workflow-btn" title="Previous workflow">
+                    <svg viewBox="0 0 16 16">
+                        <path fill-rule="evenodd"
+                            d="M11.354 1.646a.5.5 0 0 1 0 .708L5.707 8l5.647 5.646a.5.5 0 0 1-.708.708l-6-6a.5.5 0 0 1 0-.708l6-6a.5.5 0 0 1 .708 0z" />
+                    </svg>
+                </button>
+                <span class="workflow-progress" id="workflow-progress">1 / 7</span>
+                <button class="nav-arrow" id="next-workflow-btn" title="Next workflow">
+                    <svg viewBox="0 0 16 16">
+                        <path fill-rule="evenodd"
+                            d="M4.646 1.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1 0 .708l-6 6a.5.5 0 0 1-.708-.708L10.293 8 4.646 2.354a.5.5 0 0 1 0-.708z" />
+                    </svg>
+                </button>
+            </div>
+            <span class="nav-label">Workflow:</span>
+            <select class="workflow-select" id="workflow-select">
+                <!-- Workflows populated by JS -->
+            </select>
+            <button class="reset-btn" id="reset-btn" title="Reset current workflow">
+                <svg viewBox="0 0 16 16">
+                    <path d="M8 3a5 5 0 1 0 4.546 2.914.5.5 0 0 1 .908-.417A6 6 0 1 1 8 2v1z" />
+                    <path
+                        d="M8 4.466V.534a.25.25 0 0 1 .41-.192l2.36 1.966c.12.1.12.284 0 .384L8.41 4.658A.25.25 0 0 1 8 4.466z" />
+                </svg>
+            </button>
+            <button class="reset-btn" id="share-workflow-btn" title="Copy link to this workflow">
+                <svg viewBox="0 0 16 16">
+                    <path
+                        d="M4.715 6.542 3.343 7.914a3 3 0 1 0 4.243 4.243l1.828-1.829A3 3 0 0 0 8.586 5.5L8 6.086a1.002 1.002 0 0 0-.154.199 2 2 0 0 1 .861 3.337L6.88 11.45a2 2 0 1 1-2.83-2.83l.793-.792a4.018 4.018 0 0 1-.128-1.287z" />
+                    <path
+                        d="M6.586 4.672A3 3 0 0 0 7.414 9.5l.775-.776a2 2 0 0 1-.896-3.346L9.12 3.55a2 2 0 1 1 2.83 2.83l-.793.792c.112.42.155.855.128 1.287l1.372-1.372a3 3 0 1 0-4.243-4.243L6.586 4.672z" />
+                </svg>
+            </button>
+            <span class="workflow-badge" id="workflow-count">7 workflows</span>
+        </div>
+
+        <div class="nav-actions">
+            <a class="docs-btn" id="docs-btn"
+                href="https://docs.google.com/document/d/1AdgJ9M-jr_AiAloU4vReJepgG-WjXvl5DQEBnzIB9yc/edit?usp=sharing"
+                target="_blank" title="Product documentation">
+                <svg viewBox="0 0 16 16">
+                    <path
+                        d="M14.5 3A1.5 1.5 0 0 0 13 1.5H3A1.5 1.5 0 0 0 1.5 3v10A1.5 1.5 0 0 0 3 14.5h10a1.5 1.5 0 0 0 1.5-1.5V3zM13 14H3a1 1 0 0 1-1-1V3a1 1 0 0 1 1-1h10a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1z" />
+                    <path d="M4.5 4h7v1h-7V4zm0 2h7v1h-7V6zm0 2h7v1h-7V8zm0 2h4v1h-4v-1z" />
+                </svg>
+                <span>Docs</span>
+            </a>
+            <button class="share-btn" id="share-btn" title="Copy link to clipboard">
+                <svg viewBox="0 0 16 16" id="share-icon">
+                    <path
+                        d="M13.5 1a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3zM11 2.5a2.5 2.5 0 1 1 .603 1.628l-6.718 3.12a2.499 2.499 0 0 1 0 1.504l6.718 3.12a2.5 2.5 0 1 1-.488.876l-6.718-3.12a2.5 2.5 0 1 1 0-3.256l6.718-3.12A2.5 2.5 0 0 1 11 2.5zm-8.5 4a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3zm11 5.5a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3z" />
+                </svg>
+                <span id="share-text">Share</span>
+            </button>
+        </div>
+    </nav>
+
+    <!-- Toast Notification -->
+    <div class="toast" id="toast">
+        <svg viewBox="0 0 16 16">
+            <path
+                d="M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.75.75 0 0 1 1.06-1.06L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0z" />
+        </svg>
+        <span id="toast-message">Link copied to clipboard!</span>
+    </div>
+
+    <!-- Share Modal -->
+    <div class="modal-overlay" id="share-modal">
+        <div class="modal">
+            <div class="modal-header">
+                <div class="modal-title">
+                    <svg viewBox="0 0 16 16">
+                        <path
+                            d="M13.5 1a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3zM11 2.5a2.5 2.5 0 1 1 .603 1.628l-6.718 3.12a2.499 2.499 0 0 1 0 1.504l6.718 3.12a2.5 2.5 0 1 1-.488.876l-6.718-3.12a2.5 2.5 0 1 1 0-3.256l6.718-3.12A2.5 2.5 0 0 1 11 2.5zm-8.5 4a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3zm11 5.5a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3z" />
+                    </svg>
+                    <span id="modal-title-text">Share Mockup</span>
+                </div>
+                <button class="modal-close" id="modal-close">
+                    <svg viewBox="0 0 16 16">
+                        <path
+                            d="M3.72 3.72a.75.75 0 0 1 1.06 0L8 6.94l3.22-3.22a.75.75 0 1 1 1.06 1.06L9.06 8l3.22 3.22a.75.75 0 1 1-1.06 1.06L8 9.06l-3.22 3.22a.75.75 0 0 1-1.06-1.06L6.94 8 3.72 4.78a.75.75 0 0 1 0-1.06z" />
+                    </svg>
+                </button>
+            </div>
+
+            <div class="share-field">
+                <div class="share-field-label">Mockup URL</div>
+                <div class="share-field-row">
+                    <input type="text" class="share-field-input" id="share-url-input" readonly>
+                    <button class="copy-btn" id="copy-url-btn">
+                        <svg viewBox="0 0 16 16">
+                            <path
+                                d="M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 0 1 0 1.5h-1.5a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-1.5a.75.75 0 0 1 1.5 0v1.5A1.75 1.75 0 0 1 9.25 16h-7.5A1.75 1.75 0 0 1 0 14.25Z" />
+                            <path
+                                d="M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0 1 14.25 11h-7.5A1.75 1.75 0 0 1 5 9.25Zm1.75-.25a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-7.5a.25.25 0 0 0-.25-.25Z" />
+                        </svg>
+                        Copy
+                    </button>
+                </div>
+            </div>
+
+            <div class="share-field">
+                <div class="share-field-label">Password</div>
+                <div class="share-field-row">
+                    <input type="text" class="share-field-input password" id="share-password-input" value="egen"
+                        readonly>
+                    <button class="copy-btn" id="copy-password-btn">
+                        <svg viewBox="0 0 16 16">
+                            <path
+                                d="M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 0 1 0 1.5h-1.5a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-1.5a.75.75 0 0 1 1.5 0v1.5A1.75 1.75 0 0 1 9.25 16h-7.5A1.75 1.75 0 0 1 0 14.25Z" />
+                            <path
+                                d="M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0 1 14.25 11h-7.5A1.75 1.75 0 0 1 5 9.25Zm1.75-.25a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-7.5a.25.25 0 0 0-.25-.25Z" />
+                        </svg>
+                        Copy
+                    </button>
+                </div>
+            </div>
+
+            <div class="modal-footer">
+                <button class="copy-all-btn" id="copy-all-btn">
+                    <svg viewBox="0 0 16 16">
+                        <path
+                            d="M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 0 1 0 1.5h-1.5a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-1.5a.75.75 0 0 1 1.5 0v1.5A1.75 1.75 0 0 1 9.25 16h-7.5A1.75 1.75 0 0 1 0 14.25Z" />
+                        <path
+                            d="M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0 1 14.25 11h-7.5A1.75 1.75 0 0 1 5 9.25Zm1.75-.25a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-7.5a.25.25 0 0 0-.25-.25Z" />
+                    </svg>
+                    Copy Share Message
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Welcome Modal -->
+    <div class="welcome-modal-overlay" id="welcome-modal">
+        <div class="welcome-modal">
+            <div class="welcome-header">
+                <!-- Gizmo PNG - stacked above text -->
+                <div style="display: flex; flex-direction: column; align-items: center;">
+                    <img src="assets/gizmo-logo.png" alt="Gremlin" style="height: 85px; margin-bottom: 8px; filter: drop-shadow(0 0 8px rgba(74, 222, 128, 0.4));">
+                    <img src="assets/gremlin-text.png" alt="GREMLIN" style="height: 65px; margin-bottom: 16px; filter: drop-shadow(0 0 8px rgba(74, 222, 128, 0.4));">
+                </div>
+                <div class="welcome-title">Interactive Mockup</div>
+                <div class="welcome-subtitle">Experience GREMLIN through guided workflow scenarios</div>
+            </div>
+
+            <div class="welcome-instructions">
+                <div class="instruction-item">
+                    <div class="instruction-key">TYPE</div>
+                    <div class="instruction-text">
+                        <strong>Reveal pre-configured commands</strong>
+                        <span>Each keystroke reveals the next character of the scripted command</span>
+                    </div>
+                </div>
+                <div class="instruction-item">
+                    <div class="instruction-key">TAB</div>
+                    <div class="instruction-text">
+                        <strong>Auto-complete instantly</strong>
+                        <span>Skip typing and fill the entire command at once</span>
+                    </div>
+                </div>
+                <div class="instruction-item">
+                    <div class="instruction-key">ENTER</div>
+                    <div class="instruction-text">
+                        <strong>Submit & see response</strong>
+                        <span>Execute the command and watch GREMLIN respond</span>
+                    </div>
+                </div>
+            </div>
+
+            <div
+                style="background: #0d1117; border: 1px solid #30363d; border-radius: 12px; padding: 16px; margin-bottom: 24px; font-size: 13px; color: #8b949e;">
+                <div style="margin-bottom: 12px;"><strong style="color: #fff;">Layout:</strong> CLI Mockup (left) •
+                    Walkthrough Guide (right)</div>
+                <div style="margin-bottom: 12px;"><strong style="color: #fff;">Navigation:</strong> Use arrows or
+                    dropdown to switch workflows</div>
+                <div style="margin-bottom: 12px;"><strong style="color: #fff;">Docs:</strong> Click the <span
+                        style="color: #58a6ff;">Docs</span> button for the full product spec</div>
+                <div><strong style="color: #fff;">Share:</strong> Use <span style="color: #4ade80;">Share</span> to copy
+                    URL + password for colleagues</div>
+            </div>
+
+            <button class="welcome-start-btn" id="welcome-start-btn">
+                <svg viewBox="0 0 16 16">
+                    <path
+                        d="M11.596 8.697l-6.363 3.692c-.54.313-1.233-.066-1.233-.697V4.308c0-.63.692-1.01 1.233-.696l6.363 3.692a.802.802 0 0 1 0 1.393z" />
+                </svg>
+                Start Exploring
+            </button>
+        </div>
+    </div>
+
+    <!-- Completion Modal -->
+    <div class="completion-modal-overlay" id="completion-modal">
+        <div class="completion-modal">
+            <div class="completion-icon">🎉</div>
+            <div class="completion-title">Workflow Complete!</div>
+            <div class="completion-workflow-name" id="completed-workflow-name">Onboarding Journey</div>
+
+            <div class="completion-buttons">
+                <button class="completion-btn secondary" id="completion-replay-btn">
+                    <svg viewBox="0 0 16 16">
+                        <path d="M8 3a5 5 0 1 0 4.546 2.914.5.5 0 0 1 .908-.417A6 6 0 1 1 8 2v1z" />
+                        <path
+                            d="M8 4.466V.534a.25.25 0 0 1 .41-.192l2.36 1.966c.12.1.12.284 0 .384L8.41 4.658A.25.25 0 0 1 8 4.466z" />
+                    </svg>
+                    Replay
+                </button>
+                <button class="completion-btn primary" id="completion-next-btn">
+                    Next Workflow
+                    <svg viewBox="0 0 16 16">
+                        <path fill-rule="evenodd"
+                            d="M4.646 1.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1 0 .708l-6 6a.5.5 0 0 1-.708-.708L10.293 8 4.646 2.354a.5.5 0 0 1 0-.708z" />
+                    </svg>
+                </button>
+            </div>
+
+            <div class="completion-progress">
+                <div class="completion-progress-text" id="completion-progress-text">1 of 7 workflows completed</div>
+                <div class="completion-progress-bar">
+                    <div class="completion-progress-fill" id="completion-progress-fill" style="width: 14.3%"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <div class="panel" id="cli-panel">
+            <div class="panel-header">
+                <span class="panel-header-icon">&#9658;</span>
+                Interactive CLI Mockup
+            </div>
+            <iframe id="cli-iframe" src=""></iframe>
+            <div class="loading-overlay" id="cli-loading">
+                <div class="loading-spinner">Loading CLI Mockup...</div>
+            </div>
+        </div>
+        <div class="panel" id="walkthrough-panel">
+            <div class="panel-header">
+                <span class="panel-header-icon">&#9733;</span>
+                Walkthrough Guide
+            </div>
+            <iframe id="walkthrough-iframe" src=""></iframe>
+            <div class="loading-overlay" id="walkthrough-loading">
+                <div class="loading-spinner">Loading Walkthrough...</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Workflow Configuration
+        // Add new workflows here - each needs a cli and walkthrough HTML file in the workflows/ folder
+        const WORKFLOWS = [
+            {
+                id: 'onboarding',
+                name: 'Onboarding Journey',
+                description: 'New scientist onboarding: ecosystem overview to first experiment',
+                cli: 'workflows/onboarding-cli.html',
+                walkthrough: 'workflows/onboarding-walkthrough.html'
+            },
+            {
+                id: 'repo-discovery',
+                name: 'Repo Discovery (Knowledge Engine)',
+                description: 'Semantic search across 74+ internal repositories',
+                cli: 'workflows/repo-discovery-cli.html',
+                walkthrough: 'workflows/repo-discovery-walkthrough.html'
+            },
+            {
+                id: 'data-products',
+                name: 'Data Products Integration',
+                description: 'Discover, access, and version clinical/molecular datasets',
+                cli: 'workflows/data-products-cli.html',
+                walkthrough: 'workflows/data-products-walkthrough.html'
+            },
+            {
+                id: 'pretraining',
+                name: 'Unimodal Pretraining',
+                description: 'TB-scale pretraining on Spot instances with auto-recovery',
+                cli: 'workflows/pretraining-cli.html',
+                walkthrough: 'workflows/pretraining-walkthrough.html'
+            },
+            {
+                id: 'mm-fusion',
+                name: 'Multimodal Fusion Experiment',
+                description: 'Late fusion model training: cohort discovery to deployment',
+                cli: 'workflows/mm-fusion-cli.html',
+                walkthrough: 'workflows/mm-fusion-walkthrough.html'
+            },
+            {
+                id: 'debug',
+                name: 'Debug & Rescue Mission',
+                description: 'Diagnose crashes, apply fixes, resume from checkpoints',
+                cli: 'workflows/debug-cli.html',
+                walkthrough: 'workflows/debug-walkthrough.html'
+            },
+            {
+                id: 'compliance',
+                name: 'Compliance & Release Audit',
+                description: 'Governance checks, Model Cards, production deployment',
+                cli: 'workflows/compliance-cli.html',
+                walkthrough: 'workflows/compliance-walkthrough.html'
+            }
+        ];
+
+        // Deployed URL (replaced by deploy script)
+        const DEPLOY_URL = '7d3389c1-8dd1-4480-87d9-c36b9e04fc54.surge.sh';
+
+        // DOM Elements
+        const select = document.getElementById('workflow-select');
+        const cliIframe = document.getElementById('cli-iframe');
+        const walkthroughIframe = document.getElementById('walkthrough-iframe');
+        const cliLoading = document.getElementById('cli-loading');
+        const walkthroughLoading = document.getElementById('walkthrough-loading');
+        const workflowCount = document.getElementById('workflow-count');
+        const workflowProgress = document.getElementById('workflow-progress');
+        const prevBtn = document.getElementById('prev-workflow-btn');
+        const nextBtn = document.getElementById('next-workflow-btn');
+
+        // Track completed workflows in this session
+        const completedWorkflows = new Set();
+
+        // Populate dropdown
+        function populateWorkflows() {
+            WORKFLOWS.forEach((workflow, index) => {
+                const option = document.createElement('option');
+                option.value = workflow.id;
+                option.textContent = workflow.name;
+                option.title = workflow.description;
+                select.appendChild(option);
+            });
+
+            // Update badge
+            const count = WORKFLOWS.length;
+            workflowCount.textContent = `${count} workflow${count !== 1 ? 's' : ''}`;
+        }
+
+        // Update navigation state
+        function updateNavState() {
+            const currentIndex = WORKFLOWS.findIndex(w => w.id === select.value);
+            workflowProgress.textContent = `${currentIndex + 1} / ${WORKFLOWS.length}`;
+            prevBtn.disabled = currentIndex === 0;
+            nextBtn.disabled = currentIndex === WORKFLOWS.length - 1;
+        }
+
+        // Navigate to workflow by direction
+        function navigateWorkflow(direction) {
+            const currentIndex = WORKFLOWS.findIndex(w => w.id === select.value);
+            const newIndex = currentIndex + direction;
+            if (newIndex >= 0 && newIndex < WORKFLOWS.length) {
+                select.value = WORKFLOWS[newIndex].id;
+                loadWorkflow(WORKFLOWS[newIndex].id);
+            }
+        }
+
+        // Load a workflow
+        function loadWorkflow(workflowId) {
+            const workflow = WORKFLOWS.find(w => w.id === workflowId);
+            if (!workflow) return;
+
+            // Show loading
+            cliLoading.classList.add('active');
+            walkthroughLoading.classList.add('active');
+
+            // Load iframes
+            cliIframe.src = workflow.cli;
+            walkthroughIframe.src = workflow.walkthrough;
+
+            // Store in URL hash for bookmarking
+            window.location.hash = workflowId;
+
+            // Update navigation state
+            updateNavState();
+        }
+
+        // Handle iframe load
+        cliIframe.addEventListener('load', () => {
+            cliLoading.classList.remove('active');
+        });
+
+        walkthroughIframe.addEventListener('load', () => {
+            walkthroughLoading.classList.remove('active');
+        });
+
+        // Handle workflow selection
+        select.addEventListener('change', (e) => {
+            loadWorkflow(e.target.value);
+        });
+
+        // Nav arrow event listeners
+        prevBtn.addEventListener('click', () => navigateWorkflow(-1));
+        nextBtn.addEventListener('click', () => navigateWorkflow(1));
+
+        // Relay messages from CLI iframe to walkthrough iframe (for scroll sync)
+        window.addEventListener('message', (event) => {
+            if (event.data && event.data.type === 'cliStepComplete') {
+                // Forward to walkthrough iframe
+                walkthroughIframe.contentWindow.postMessage(
+                    { type: 'scrollToStep', step: event.data.step },
+                    '*'
+                );
+            }
+
+            // Handle workflow completion from CLI iframe
+            if (event.data && event.data.type === 'workflowComplete') {
+                showCompletionModal();
+            }
+        });
+
+        // Keyboard navigation
+        document.addEventListener('keydown', (e) => {
+            if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+
+            const currentIndex = WORKFLOWS.findIndex(w => w.id === select.value);
+
+            if (e.key === 'ArrowUp' || e.key === 'ArrowLeft') {
+                e.preventDefault();
+                const newIndex = currentIndex > 0 ? currentIndex - 1 : WORKFLOWS.length - 1;
+                select.value = WORKFLOWS[newIndex].id;
+                loadWorkflow(WORKFLOWS[newIndex].id);
+            } else if (e.key === 'ArrowDown' || e.key === 'ArrowRight') {
+                e.preventDefault();
+                const newIndex = currentIndex < WORKFLOWS.length - 1 ? currentIndex + 1 : 0;
+                select.value = WORKFLOWS[newIndex].id;
+                loadWorkflow(WORKFLOWS[newIndex].id);
+            }
+        });
+
+        // Welcome Modal (must be defined before init)
+        const welcomeModal = document.getElementById('welcome-modal');
+        const welcomeStartBtn = document.getElementById('welcome-start-btn');
+
+        function showWelcomeModal() {
+            welcomeModal.classList.add('show');
+        }
+
+        function closeWelcomeModal() {
+            welcomeModal.classList.remove('show');
+            // Focus on CLI iframe for keyboard input
+            cliIframe.focus();
+        }
+
+        welcomeStartBtn.addEventListener('click', closeWelcomeModal);
+
+        // Initialize
+        function init() {
+            populateWorkflows();
+
+            // Check URL hash for workflow
+            const hash = window.location.hash.slice(1);
+            const initialWorkflow = WORKFLOWS.find(w => w.id === hash) || WORKFLOWS[0];
+
+            if (initialWorkflow) {
+                select.value = initialWorkflow.id;
+                loadWorkflow(initialWorkflow.id);
+            }
+
+            // Show welcome modal on load
+            showWelcomeModal();
+        }
+
+        init();
+
+        // Completion Modal
+        const completionModal = document.getElementById('completion-modal');
+        const completedWorkflowName = document.getElementById('completed-workflow-name');
+        const completionReplayBtn = document.getElementById('completion-replay-btn');
+        const completionNextBtn = document.getElementById('completion-next-btn');
+        const completionProgressText = document.getElementById('completion-progress-text');
+        const completionProgressFill = document.getElementById('completion-progress-fill');
+
+        function showCompletionModal() {
+            const currentWorkflow = WORKFLOWS.find(w => w.id === select.value);
+            const currentIndex = WORKFLOWS.findIndex(w => w.id === select.value);
+
+            // Track this workflow as completed
+            completedWorkflows.add(select.value);
+
+            // Update modal content
+            completedWorkflowName.textContent = currentWorkflow.name;
+
+            // Update progress
+            const completedCount = completedWorkflows.size;
+            completionProgressText.textContent = `${completedCount} of ${WORKFLOWS.length} workflows completed`;
+            completionProgressFill.style.width = `${(completedCount / WORKFLOWS.length) * 100}%`;
+
+            // Disable next button if on last workflow
+            const isLastWorkflow = currentIndex === WORKFLOWS.length - 1;
+            completionNextBtn.disabled = isLastWorkflow;
+            completionNextBtn.textContent = isLastWorkflow ? 'All Done!' : 'Next Workflow';
+
+            // Show modal
+            completionModal.classList.add('show');
+        }
+
+        function closeCompletionModal() {
+            completionModal.classList.remove('show');
+        }
+
+        completionReplayBtn.addEventListener('click', () => {
+            closeCompletionModal();
+            resetWorkflow();
+        });
+
+        completionNextBtn.addEventListener('click', () => {
+            closeCompletionModal();
+            navigateWorkflow(1);
+        });
+
+        // Close completion modal on overlay click
+        completionModal.addEventListener('click', (e) => {
+            if (e.target === completionModal) {
+                closeCompletionModal();
+            }
+        });
+
+        // Share functionality
+        const shareBtn = document.getElementById('share-btn');
+        const shareText = document.getElementById('share-text');
+        const toast = document.getElementById('toast');
+        const toastMessage = document.getElementById('toast-message');
+
+        function showToast(message, duration = 3000) {
+            toastMessage.textContent = message;
+            toast.classList.add('show');
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, duration);
+        }
+
+        async function copyText(text) {
+            try {
+                await navigator.clipboard.writeText(text);
+                return true;
+            } catch (err) {
+                // Fallback for older browsers
+                const textArea = document.createElement('textarea');
+                textArea.value = text;
+                textArea.style.position = 'fixed';
+                textArea.style.left = '-999999px';
+                document.body.appendChild(textArea);
+                textArea.select();
+                try {
+                    document.execCommand('copy');
+                    document.body.removeChild(textArea);
+                    return true;
+                } catch (e) {
+                    document.body.removeChild(textArea);
+                    return false;
+                }
+            }
+        }
+
+        // Share Modal
+        const shareModal = document.getElementById('share-modal');
+        const modalClose = document.getElementById('modal-close');
+        const shareUrlInput = document.getElementById('share-url-input');
+        const sharePasswordInput = document.getElementById('share-password-input');
+        const copyUrlBtn = document.getElementById('copy-url-btn');
+        const copyPasswordBtn = document.getElementById('copy-password-btn');
+        const copyAllBtn = document.getElementById('copy-all-btn');
+        const modalTitleText = document.getElementById('modal-title-text');
+
+        // Track if current share is for a specific workflow
+        let sharingWorkflow = false;
+        let sharedWorkflowName = '';
+
+        function openShareModal(includeWorkflow = false) {
+            sharingWorkflow = includeWorkflow;
+            const hash = includeWorkflow ? (window.location.hash || '') : '';
+            const url = `https://${DEPLOY_URL}${hash}`;
+            shareUrlInput.value = url;
+
+            // Update modal title based on share type
+            if (includeWorkflow) {
+                const currentWorkflow = WORKFLOWS.find(w => w.id === select.value);
+                sharedWorkflowName = currentWorkflow ? currentWorkflow.name : 'this workflow';
+                modalTitleText.textContent = 'Share Workflow Link';
+            } else {
+                sharedWorkflowName = '';
+                modalTitleText.textContent = 'Share Mockup';
+            }
+
+            shareModal.classList.add('show');
+        }
+
+        function closeShareModal() {
+            shareModal.classList.remove('show');
+        }
+
+        // Main share button - opens modal with base URL
+        shareBtn.addEventListener('click', () => openShareModal(false));
+
+        // Share workflow button - opens modal with workflow hash
+        const shareWorkflowBtn = document.getElementById('share-workflow-btn');
+        shareWorkflowBtn.addEventListener('click', () => openShareModal(true));
+
+        // Close modal
+        modalClose.addEventListener('click', closeShareModal);
+        shareModal.addEventListener('click', (e) => {
+            if (e.target === shareModal) closeShareModal();
+        });
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && shareModal.classList.contains('show')) {
+                closeShareModal();
+            }
+        });
+
+        // Copy URL button
+        copyUrlBtn.addEventListener('click', async () => {
+            const success = await copyText(shareUrlInput.value);
+            if (success) {
+                showToast('URL copied!');
+                copyUrlBtn.classList.add('copied');
+                copyUrlBtn.querySelector('svg + *')?.remove();
+                copyUrlBtn.innerHTML = copyUrlBtn.innerHTML.replace('Copy', 'Copied!');
+                setTimeout(() => {
+                    copyUrlBtn.classList.remove('copied');
+                    copyUrlBtn.innerHTML = copyUrlBtn.innerHTML.replace('Copied!', 'Copy');
+                }, 2000);
+            }
+        });
+
+        // Copy password button
+        copyPasswordBtn.addEventListener('click', async () => {
+            const success = await copyText(sharePasswordInput.value);
+            if (success) {
+                showToast('Password copied!');
+                copyPasswordBtn.classList.add('copied');
+                copyPasswordBtn.innerHTML = copyPasswordBtn.innerHTML.replace('Copy', 'Copied!');
+                setTimeout(() => {
+                    copyPasswordBtn.classList.remove('copied');
+                    copyPasswordBtn.innerHTML = copyPasswordBtn.innerHTML.replace('Copied!', 'Copy');
+                }, 2000);
+            }
+        });
+
+        // Copy share message button
+        copyAllBtn.addEventListener('click', async () => {
+            let message;
+            if (sharingWorkflow && sharedWorkflowName) {
+                // Workflow-specific share message
+                message = `Check out the "${sharedWorkflowName}" workflow in the Gremlin Mockup:
+
+${shareUrlInput.value}
+
+Password: ${sharePasswordInput.value}
+
+This link opens directly to this specific workflow.
+
+How to drive:
+1. Drive the CLI (Left Panel): Just start typing on your keyboard to auto-fill commands. Press TAB to autocomplete instantly, and ENTER to submit.
+2. Follow the Guide (Right Panel): Read the walkthrough to understand the narrative.
+3. Documentation: Click the 'Docs' button in the top right for the full PRD.`;
+            } else {
+                // General mockup share message
+                message = `Check out the Gremlin Mockup:
+
+${shareUrlInput.value}
+
+Password: ${sharePasswordInput.value}
+
+How to drive:
+1. Drive the CLI (Left Panel): Just start typing on your keyboard to auto-fill commands. Press TAB to autocomplete instantly, and ENTER to submit.
+2. Follow the Guide (Right Panel): Read the walkthrough to understand the narrative.
+3. Documentation: Click the 'Docs' button in the top right for the full PRD.`;
+            }
+            const success = await copyText(message);
+            if (success) {
+                showToast('Share message copied!');
+                copyAllBtn.innerHTML = copyAllBtn.innerHTML.replace('Copy Share Message', 'Copied!');
+                setTimeout(() => {
+                    copyAllBtn.innerHTML = copyAllBtn.innerHTML.replace('Copied!', 'Copy Share Message');
+                }, 2000);
+            }
+        });
+
+        // Reset functionality
+        const resetBtn = document.getElementById('reset-btn');
+
+        function resetWorkflow() {
+            // Send reset message to CLI iframe
+            cliIframe.contentWindow.postMessage({ type: 'resetWorkflow' }, '*');
+
+            // Scroll walkthrough back to top
+            walkthroughIframe.contentWindow.postMessage({ type: 'scrollToStep', step: 1 }, '*');
+
+            showToast('Workflow reset');
+        }
+
+        resetBtn.addEventListener('click', resetWorkflow);
+    </script>
+</body>
+
+</html>

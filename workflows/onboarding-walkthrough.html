@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Onboarding Workflow - Walkthrough</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+            line-height: 1.6;
+            color: #c9d1d9;
+            background-color: #0d1117;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+
+        h1, h2, h3 {
+            color: #ffffff;
+            border-bottom: 1px solid #21262d;
+            padding-bottom: .3em;
+        }
+
+        h1 {
+            font-size: 2em;
+            border-bottom: none;
+        }
+
+        h2 {
+            margin-top: 2em;
+        }
+
+        a {
+            color: #58a6ff;
+            text-decoration: none;
+        }
+
+        code {
+            background-color: #161b22;
+            padding: 0.2em 0.4em;
+            border-radius: 6px;
+            font-family: ui-monospace, SFMono-Regular, SF Mono, Menlo, Consolas, Liberation Mono, monospace;
+            font-size: 85%;
+        }
+
+        blockquote {
+            color: #8b949e;
+            border-left: 0.25em solid #30363d;
+            padding: 0 1em;
+            margin: 0;
+        }
+
+        .markdown-alert {
+            padding: 8px 16px;
+            margin-bottom: 16px;
+            border-left: 0.25em solid;
+            border-radius: 6px;
+        }
+
+        .markdown-alert-tip {
+            border-color: #3fb950;
+            background-color: #161b22;
+        }
+
+        .markdown-alert-important {
+            border-color: #a371f7;
+            background-color: #161b22;
+        }
+
+        .markdown-alert-warning {
+            border-color: #d29922;
+            background-color: #161b22;
+        }
+
+        .markdown-alert-title {
+            display: flex;
+            align-items: center;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .markdown-alert-tip .markdown-alert-title {
+            color: #3fb950;
+        }
+
+        .markdown-alert-important .markdown-alert-title {
+            color: #a371f7;
+        }
+
+        .markdown-alert-warning .markdown-alert-title {
+            color: #d29922;
+        }
+
+        .subtitle {
+            color: #8b949e;
+            font-style: italic;
+            margin-top: -10px;
+            display: block;
+            margin-bottom: 30px;
+        }
+
+        .section-desc {
+            color: #8b949e;
+            font-style: italic;
+            margin-bottom: 16px;
+            display: block;
+        }
+
+        .comparison-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1rem 0;
+        }
+
+        .comparison-table th, .comparison-table td {
+            border: 1px solid #30363d;
+            padding: 8px 12px;
+            text-align: left;
+        }
+
+        .comparison-table th {
+            background-color: #161b22;
+            color: #8b949e;
+        }
+
+        .comparison-table td {
+            background-color: #0d1117;
+        }
+
+        .stat-highlight {
+            background: linear-gradient(90deg, rgba(63, 185, 80, 0.1), transparent);
+            border-left: 3px solid #3fb950;
+            padding: 12px 16px;
+            margin: 16px 0;
+        }
+
+        .stat-value {
+            font-size: 1.5em;
+            font-weight: bold;
+            color: #3fb950;
+        }
+
+        .stat-label {
+            color: #8b949e;
+            font-size: 0.9em;
+        }
+    </style>
+</head>
+
+<body>
+
+    <h1>The Onboarding Journey</h1>
+    <span class="subtitle">From "Where am I?" to productive in days, not weeks</span>
+
+    <p>This demo illustrates how GREMLIN transforms the new hire experience, reducing time-to-productivity from <strong>3-4 weeks</strong> to <strong>3-4 days</strong> by providing instant access to institutional knowledge.</p>
+
+    <div class="stat-highlight">
+        <div class="stat-value">74+ Repositories</div>
+        <div class="stat-label">The Tempus ML landscape that GREMLIN makes navigable</div>
+    </div>
+
+    <h2 id="step-1">1. Orientation: "Where Am I?"</h2>
+    <span class="section-desc">Getting a structured map of the ML ecosystem on Day 1.</span>
+
+    <p><strong>Input</strong>:</p>
+    <blockquote>
+        "I just joined the ML team. Give me an overview of the ML infrastructure."
+    </blockquote>
+    <br>
+
+    <div class="markdown-alert markdown-alert-tip">
+        <div class="markdown-alert-title">
+            <svg class="octicon" viewBox="0 0 16 16" version="1.1" width="16" height="16" aria-hidden="true"
+                fill="currentColor" style="margin-right: 8px;">
+                <path d="M8 1.5c-2.363 0-4 1.69-4 3.75 0 .984.424 1.625.984 2.304l.214.253c.223.264.47.556.673.848.284.411.537.896.621 1.49a.75.75 0 0 1-1.484.211c-.04-.282-.163-.547-.37-.847a8.456 8.456 0 0 0-.542-.68c-.084-.1-.173-.205-.268-.32C3.201 7.025 2.5 6.227 2.5 5.25 2.5 2.31 4.863 0 8 0s5.5 2.31 5.5 5.25c0 .977-.701 1.775-1.328 2.259-.095.115-.184.22-.268.319-.207.245-.383.453-.541.681-.208.3-.33.565-.37.847a.751.751 0 0 1-1.485-.212c.084-.593.337-1.078.621-1.489.203-.292.45-.584.673-.848.075-.088.147-.173.213-.253.561-.679.985-1.32.985-2.304 0-2.06-1.637-3.75-4-3.75ZM5.75 12h4.5a.75.75 0 0 1 0 1.5h-4.5a.75.75 0 0 1 0-1.5ZM6 15.25a.75.75 0 0 1 .75-.75h2.5a.75.75 0 0 1 0 1.5h-2.5a.75.75 0 0 1-.75-.75Z"></path>
+            </svg>
+            Key Concepts
+        </div>
+        <ul>
+            <li><strong>Role-Tailored Maps</strong>: GREMLIN provides ecosystem overviews customized to the scientist's role (ML Engineer, NLP Scientist, etc.)</li>
+            <li><strong>Three Core Systems</strong>: Atlas (registry), Hypernexus (compute), Inferno (serving) - the foundational workflow.</li>
+            <li><strong>No Documentation Archaeology</strong>: Instead of reading stale wikis, ask questions and get current answers.</li>
+        </ul>
+    </div>
+
+    <h2 id="step-2">2. First Experiment: Setup</h2>
+    <span class="section-desc">Running "Hello World" on Tempus infrastructure.</span>
+
+    <p><strong>Input</strong>:</p>
+    <blockquote>
+        "Y" (Accept guided tutorial)
+    </blockquote>
+    <br>
+
+    <div class="markdown-alert markdown-alert-tip">
+        <div class="markdown-alert-title">
+            <svg class="octicon" viewBox="0 0 16 16" version="1.1" width="16" height="16" aria-hidden="true"
+                fill="currentColor" style="margin-right: 8px;">
+                <path d="M8 1.5c-2.363 0-4 1.69-4 3.75 0 .984.424 1.625.984 2.304l.214.253c.223.264.47.556.673.848.284.411.537.896.621 1.49a.75.75 0 0 1-1.484.211c-.04-.282-.163-.547-.37-.847a8.456 8.456 0 0 0-.542-.68c-.084-.1-.173-.205-.268-.32C3.201 7.025 2.5 6.227 2.5 5.25 2.5 2.31 4.863 0 8 0s5.5 2.31 5.5 5.25c0 .977-.701 1.775-1.328 2.259-.095.115-.184.22-.268.319-.207.245-.383.453-.541.681-.208.3-.33.565-.37.847a.751.751 0 0 1-1.485-.212c.084-.593.337-1.078.621-1.489.203-.292.45-.584.673-.848.075-.088.147-.173.213-.253.561-.679.985-1.32.985-2.304 0-2.06-1.637-3.75-4-3.75ZM5.75 12h4.5a.75.75 0 0 1 0 1.5h-4.5a.75.75 0 0 1 0-1.5ZM6 15.25a.75.75 0 0 1 .75-.75h2.5a.75.75 0 0 1 0 1.5h-2.5a.75.75 0 0 1-.75-.75Z"></path>
+            </svg>
+            Key Concepts
+        </div>
+        <ul>
+            <li><strong>Curated Learning Datasets</strong>: Pre-validated cohorts (<code>tutorial_nsclc_v1</code>) designed for safe experimentation.</li>
+            <li><strong>Environment Verification</strong>: GREMLIN checks that CLI tools are properly installed before proceeding.</li>
+            <li><strong>Guided Steps</strong>: No guesswork - each step is explained with exact commands.</li>
+        </ul>
+    </div>
+
+    <h2 id="step-3">3. First Experiment: Config Generation</h2>
+    <span class="section-desc">Auto-generating a valid experiment configuration.</span>
+
+    <p><strong>Input</strong>:</p>
+    <blockquote>
+        "1" (Select NSCLC classification tutorial)
+    </blockquote>
+    <br>
+
+    <div class="markdown-alert markdown-alert-important">
+        <div class="markdown-alert-title">
+            <svg class="octicon" viewBox="0 0 16 16" version="1.1" width="16" height="16" aria-hidden="true"
+                fill="currentColor" style="margin-right: 8px;">
+                <path d="M0 1.75C0 .784.784 0 1.75 0h12.5C15.216 0 16 .784 16 1.75v9.5A1.75 1.75 0 0 1 14.25 13H8.06l-2.573 2.573A1.458 1.458 0 0 1 3 14.543V13H1.75A1.75 1.75 0 0 1 0 11.25Zm1.75-.25a.25.25 0 0 0-.25.25v9.5c0 .138.112.25.25.25h2a.75.75 0 0 1 .75.75v2.19l2.72-2.72a.75.75 0 0 1 .53-.22h6.5a.25.25 0 0 0 .25-.25v-9.5a.25.25 0 0 0-.25-.25Zm7 2.25v2.5a.75.75 0 0 1-1.5 0v-2.5a.75.75 0 0 1 1.5 0ZM9 9a1 1 0 1 1-2 0 1 1 0 0 1 2 0Z"></path>
+            </svg>
+            Insight: No Copy-Paste Config Hell
+        </div>
+        <p>Instead of hunting for "sample configs" that are 2 years old:</p>
+        <ol>
+            <li><strong>Best-Practice Defaults</strong>: Seed for reproducibility, appropriate batch sizes, modern architecture.</li>
+            <li><strong>Atlas URIs</strong>: Proper <code>atlas://</code> URIs ensure lineage tracking from day one.</li>
+            <li><strong>Cost Transparency</strong>: "~$2 of compute" - scientists understand the resource impact.</li>
+        </ol>
+    </div>
+
+    <h2 id="step-4">4. First Experiment: Results</h2>
+    <span class="section-desc">Completing the first training run.</span>
+
+    <p><strong>Input</strong>:</p>
+    <blockquote>
+        "Y" (Confirm submission)
+    </blockquote>
+    <br>
+
+    <div class="markdown-alert markdown-alert-tip">
+        <div class="markdown-alert-title">
+            <svg class="octicon" viewBox="0 0 16 16" version="1.1" width="16" height="16" aria-hidden="true"
+                fill="currentColor" style="margin-right: 8px;">
+                <path d="M8 1.5c-2.363 0-4 1.69-4 3.75 0 .984.424 1.625.984 2.304l.214.253c.223.264.47.556.673.848.284.411.537.896.621 1.49a.75.75 0 0 1-1.484.211c-.04-.282-.163-.547-.37-.847a8.456 8.456 0 0 0-.542-.68c-.084-.1-.173-.205-.268-.32C3.201 7.025 2.5 6.227 2.5 5.25 2.5 2.31 4.863 0 8 0s5.5 2.31 5.5 5.25c0 .977-.701 1.775-1.328 2.259-.095.115-.184.22-.268.319-.207.245-.383.453-.541.681-.208.3-.33.565-.37.847a.751.751 0 0 1-1.485-.212c.084-.593.337-1.078.621-1.489.203-.292.45-.584.673-.848.075-.088.147-.173.213-.253.561-.679.985-1.32.985-2.304 0-2.06-1.637-3.75-4-3.75ZM5.75 12h4.5a.75.75 0 0 1 0 1.5h-4.5a.75.75 0 0 1 0-1.5ZM6 15.25a.75.75 0 0 1 .75-.75h2.5a.75.75 0 0 1 0 1.5h-2.5a.75.75 0 0 1-.75-.75Z"></path>
+            </svg>
+            Key Concepts
+        </div>
+        <ul>
+            <li><strong>End-to-End in Minutes</strong>: From zero to trained model with real metrics.</li>
+            <li><strong>Clear Results</strong>: Accuracy, F1, AUC presented in a digestible format.</li>
+            <li><strong>Next Steps Guidance</strong>: GREMLIN suggests natural progressions - harder tasks, fusion models.</li>
+        </ul>
+    </div>
+
+    <h2 id="step-5">5. Deep Dive: "How Do I...?"</h2>
+    <span class="section-desc">Answering questions that would normally require Slack threads.</span>
+
+    <p><strong>Input</strong>:</p>
+    <blockquote>
+        "How do I add RNA data to a fusion model?"
+    </blockquote>
+    <br>
+
+    <div class="markdown-alert markdown-alert-important">
+        <div class="markdown-alert-title">
+            <svg class="octicon" viewBox="0 0 16 16" version="1.1" width="16" height="16" aria-hidden="true"
+                fill="currentColor" style="margin-right: 8px;">
+                <path d="M0 1.75C0 .784.784 0 1.75 0h12.5C15.216 0 16 .784 16 1.75v9.5A1.75 1.75 0 0 1 14.25 13H8.06l-2.573 2.573A1.458 1.458 0 0 1 3 14.543V13H1.75A1.75 1.75 0 0 1 0 11.25Zm1.75-.25a.25.25 0 0 0-.25.25v9.5c0 .138.112.25.25.25h2a.75.75 0 0 1 .75.75v2.19l2.72-2.72a.75.75 0 0 1 .53-.22h6.5a.25.25 0 0 0 .25-.25v-9.5a.25.25 0 0 0-.25-.25Zm7 2.25v2.5a.75.75 0 0 1-1.5 0v-2.5a.75.75 0 0 1 1.5 0ZM9 9a1 1 0 1 1-2 0 1 1 0 0 1 2 0Z"></path>
+            </svg>
+            Insight: Institutional Memory on Demand
+        </div>
+        <p>This question would normally require:</p>
+        <ol>
+            <li>Searching Confluence (47 irrelevant results)</li>
+            <li>Asking on Slack, waiting 4 hours</li>
+            <li>Getting pointed to a README that says "see other repo"</li>
+        </ol>
+        <p><strong>With GREMLIN</strong>: Instant, authoritative answer with exact file paths and config snippets.</p>
+    </div>
+
+    <h2 id="step-6">6. Troubleshooting: NCCL Error</h2>
+    <span class="section-desc">Diagnosing a cryptic distributed training error.</span>
+
+    <p><strong>Input</strong>:</p>
+    <blockquote>
+        "My job failed with 'NCCL timeout exceeded.' What does this mean?"
+    </blockquote>
+    <br>
+
+    <div class="markdown-alert markdown-alert-warning">
+        <div class="markdown-alert-title">
+            <svg class="octicon" viewBox="0 0 16 16" version="1.1" width="16" height="16" aria-hidden="true"
+                fill="currentColor" style="margin-right: 8px;">
+                <path d="M6.457 1.047c.659-1.234 2.427-1.234 3.086 0l6.082 11.378A1.75 1.75 0 0 1 14.082 15H1.918a1.75 1.75 0 0 1-1.543-2.575Zm1.763.707a.25.25 0 0 0-.44 0L1.698 13.132a.25.25 0 0 0 .22.368h12.164a.25.25 0 0 0 .22-.368Zm.53 3.996v2.5a.75.75 0 0 1-1.5 0v-2.5a.75.75 0 0 1 1.5 0ZM9 11a1 1 0 1 1-2 0 1 1 0 0 1 2 0Z"></path>
+            </svg>
+            Tempus-Specific Solutions
+        </div>
+        <ul>
+            <li><strong>Not Generic StackOverflow</strong>: GREMLIN knows Hypernexus uses TCP/IP networking (no RDMA).</li>
+            <li><strong>Ranked Solutions</strong>: Quick fix vs. better fix vs. best fix - let the scientist choose.</li>
+            <li><strong>Internal Runbooks</strong>: Points to <code>sre/runbooks/nccl-troubleshooting.md</code> for deeper learning.</li>
+        </ul>
+    </div>
+
+    <h2 id="step-7">7. Troubleshooting: Apply Fix</h2>
+    <span class="section-desc">Patching the config automatically.</span>
+
+    <p><strong>Input</strong>:</p>
+    <blockquote>
+        "2" (Apply gradient accumulation fix)
+    </blockquote>
+    <br>
+
+    <div class="markdown-alert markdown-alert-tip">
+        <div class="markdown-alert-title">
+            <svg class="octicon" viewBox="0 0 16 16" version="1.1" width="16" height="16" aria-hidden="true"
+                fill="currentColor" style="margin-right: 8px;">
+                <path d="M8 1.5c-2.363 0-4 1.69-4 3.75 0 .984.424 1.625.984 2.304l.214.253c.223.264.47.556.673.848.284.411.537.896.621 1.49a.75.75 0 0 1-1.484.211c-.04-.282-.163-.547-.37-.847a8.456 8.456 0 0 0-.542-.68c-.084-.1-.173-.205-.268-.32C3.201 7.025 2.5 6.227 2.5 5.25 2.5 2.31 4.863 0 8 0s5.5 2.31 5.5 5.25c0 .977-.701 1.775-1.328 2.259-.095.115-.184.22-.268.319-.207.245-.383.453-.541.681-.208.3-.33.565-.37.847a.751.751 0 0 1-1.485-.212c.084-.593.337-1.078.621-1.489.203-.292.45-.584.673-.848.075-.088.147-.173.213-.253.561-.679.985-1.32.985-2.304 0-2.06-1.637-3.75-4-3.75ZM5.75 12h4.5a.75.75 0 0 1 0 1.5h-4.5a.75.75 0 0 1 0-1.5ZM6 15.25a.75.75 0 0 1 .75-.75h2.5a.75.75 0 0 1 0 1.5h-2.5a.75.75 0 0 1-.75-.75Z"></path>
+            </svg>
+            Key Concepts
+        </div>
+        <ul>
+            <li><strong>One-Click Fix</strong>: Config patched without manual YAML editing.</li>
+            <li><strong>Explanation Included</strong>: "Reduces network traffic by 4x" - teaching while fixing.</li>
+        </ul>
+    </div>
+
+    <h2 id="step-8">8. Best Practices Review</h2>
+    <span class="section-desc">Proactive config auditing against team conventions.</span>
+
+    <p><strong>Input</strong>:</p>
+    <blockquote>
+        "Review my experiment config for best practices."
+    </blockquote>
+    <br>
+
+    <div class="markdown-alert markdown-alert-important">
+        <div class="markdown-alert-title">
+            <svg class="octicon" viewBox="0 0 16 16" version="1.1" width="16" height="16" aria-hidden="true"
+                fill="currentColor" style="margin-right: 8px;">
+                <path d="M0 1.75C0 .784.784 0 1.75 0h12.5C15.216 0 16 .784 16 1.75v9.5A1.75 1.75 0 0 1 14.25 13H8.06l-2.573 2.573A1.458 1.458 0 0 1 3 14.543V13H1.75A1.75 1.75 0 0 1 0 11.25Zm1.75-.25a.25.25 0 0 0-.25.25v9.5c0 .138.112.25.25.25h2a.75.75 0 0 1 .75.75v2.19l2.72-2.72a.75.75 0 0 1 .53-.22h6.5a.25.25 0 0 0 .25-.25v-9.5a.25.25 0 0 0-.25-.25Zm7 2.25v2.5a.75.75 0 0 1-1.5 0v-2.5a.75.75 0 0 1 1.5 0ZM9 9a1 1 0 1 1-2 0 1 1 0 0 1 2 0Z"></path>
+            </svg>
+            Insight: Learning Through Feedback
+        </div>
+        <p>Traditional onboarding: Absorb conventions through code review feedback over 6 months.</p>
+        <p><strong>With GREMLIN</strong>:</p>
+        <ul>
+            <li><strong>Instant Feedback</strong>: Know what's right before the PR review.</li>
+            <li><strong>Categorized Issues</strong>: Good practices vs. suggestions vs. issues.</li>
+            <li><strong>Auto-Fix Option</strong>: Apply all changes automatically.</li>
+        </ul>
+    </div>
+
+    <h2 id="step-9">9. Onboarding Complete</h2>
+    <span class="section-desc">Summary of the accelerated onboarding journey.</span>
+
+    <p><strong>Input</strong>:</p>
+    <blockquote>
+        "Y" (Apply fixes)
+    </blockquote>
+    <br>
+
+    <table class="comparison-table">
+        <tr>
+            <th>Traditional Onboarding</th>
+            <th>GREMLIN-Assisted</th>
+        </tr>
+        <tr>
+            <td>Read stale documentation</td>
+            <td>Ask questions, get current answers</td>
+        </tr>
+        <tr>
+            <td>Wait for Slack responses</td>
+            <td>Instant answers from knowledge base</td>
+        </tr>
+        <tr>
+            <td>Learn by making mistakes</td>
+            <td>Proactive best-practice guidance</td>
+        </tr>
+        <tr>
+            <td>Absorb tribal knowledge over months</td>
+            <td>Access institutional memory immediately</td>
+        </tr>
+        <tr>
+            <td>Rely on senior engineer availability</td>
+            <td>Self-service 24/7</td>
+        </tr>
+    </table>
+
+    <div class="stat-highlight">
+        <div class="stat-value">3-4 days vs. 3-4 weeks</div>
+        <div class="stat-label">Time to productivity improvement with GREMLIN</div>
+    </div>
+
+    <script>
+        window.addEventListener('message', (event) => {
+            if (event.data && event.data.type === 'scrollToStep') {
+                const stepId = `step-${event.data.step}`;
+                const element = document.getElementById(stepId);
+                if (element) {
+                    element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }
+            }
+        });
+    </script>
+
+</body>
+
+</html>

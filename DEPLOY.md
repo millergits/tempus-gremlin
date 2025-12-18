@@ -1,27 +1,53 @@
 # Deployment & Access Guide
 
-## Accessing the Demo
-The latest version of the demo is hosted at:
-**[https://tempus-gremlin-demo-v1.surge.sh](https://tempus-gremlin-demo-v1.surge.sh)**
+## Accessing the Mockup
+The mockup is hosted at a **persistent, unique URL**.
 
-*   **Password:** `tempus`
+*   **URL:** `https://[your-guid].surge.sh`
+    *   *Check the ` .domain` file or the deployment output for your specific URL.*
+*   **Password:** `egen`
 
 ## Deploying Updates
-To deploy a new version, run the automated script:
+To deploy a new version to the **same URL**, run:
 
 ```bash
-./deploy_demo.sh
+./build_mockup.sh
 ```
 
 ### How It Works
-This script performs several security steps completely automatically:
+1.  **Persistent Domain**: The first time you run the script, it generates a unique `[guid].surge.sh` domain and saves it to a file named `.domain`.
+2.  **Subsequent Deploys**: All future deployments read from `.domain` and push updates to that exact same URL.
+3.  **GUID Obfuscation**: The content pages (`gremlin-cli-mockup.html` etc) are still renamed to *new* random GUIDs on every deploy for security.
+4.  **Encryption**: The main page is always encrypted (Password: `egen`).
 
-1.  **GUID Generation**: It generates unique, random UUIDs (e.g., `a1b2-c3d4...html`) for your content pages (`gremlin-cli-demo.html` and `DEMO_WALKTHROUGH.html`).
-2.  **Obfuscation**: It creates a temporary version of `demo.html` that points to these secret, random filenames instead of the obvious ones.
-3.  **Encryption**: It uses **Staticrypt** to password-protect the main `demo.html` file.
-4.  **Deployment**: It copies the renamed files and the encrypted index to the `dist` folder and pushes them to Surge.
+### Resetting the Domain
+If you want to generate a **fresh, new URL** (for example, to invalidate the old link):
 
-**Result**: The "real" URLs of your inner pages change every time you deploy. Even if a bad actor guesses your domain, they cannot find the content without logging in through the main page.
+1.  Delete the hidden `.domain` file:
+    ```bash
+    rm .domain
+    ```
+2.  Run the deployment script again:
+    ```bash
+    ./build_mockup.sh
+    ```
+    This will generate a new random domain and save it to a new `.domain` file.
+
+## Managing Deployment History
+
+Since Surge deployments are permanent by default, you may want to list or remove old ones.
+
+### List all your sites
+To see every URL currently hosted by your account:
+```bash
+npx surge list
+```
+
+### Remove a site (Teardown)
+To permanently delete an old deployment:
+```bash
+npx surge teardown [your-domain.surge.sh]
+```
 
 ## Surge Credentials (Reference)
 *   **Email**: `accounts@itmiller.com`

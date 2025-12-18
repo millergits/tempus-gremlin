@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Unimodal Pretraining - Walkthrough</title>
+    <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif; line-height: 1.6; color: #c9d1d9; background-color: #0d1117; max-width: 800px; margin: 0 auto; padding: 40px 20px; }
+        h1, h2, h3 { color: #ffffff; border-bottom: 1px solid #21262d; padding-bottom: .3em; }
+        h1 { font-size: 2em; border-bottom: none; }
+        h2 { margin-top: 2em; }
+        code { background-color: #161b22; padding: 0.2em 0.4em; border-radius: 6px; font-family: ui-monospace, SFMono-Regular, SF Mono, Menlo, Consolas, Liberation Mono, monospace; font-size: 85%; }
+        blockquote { color: #8b949e; border-left: 0.25em solid #30363d; padding: 0 1em; margin: 0; }
+        .markdown-alert { padding: 8px 16px; margin-bottom: 16px; border-left: 0.25em solid; border-radius: 6px; }
+        .markdown-alert-tip { border-color: #3fb950; background-color: #161b22; }
+        .markdown-alert-important { border-color: #a371f7; background-color: #161b22; }
+        .markdown-alert-warning { border-color: #d29922; background-color: #161b22; }
+        .markdown-alert-title { display: flex; align-items: center; font-weight: 600; margin-bottom: 8px; }
+        .markdown-alert-tip .markdown-alert-title { color: #3fb950; }
+        .markdown-alert-important .markdown-alert-title { color: #a371f7; }
+        .markdown-alert-warning .markdown-alert-title { color: #d29922; }
+        .subtitle { color: #8b949e; font-style: italic; margin-top: -10px; display: block; margin-bottom: 30px; }
+        .section-desc { color: #8b949e; font-style: italic; margin-bottom: 16px; display: block; }
+        .stat-highlight { background: linear-gradient(90deg, rgba(63, 185, 80, 0.1), transparent); border-left: 3px solid #3fb950; padding: 12px 16px; margin: 16px 0; }
+        .stat-value { font-size: 1.5em; font-weight: bold; color: #3fb950; }
+        .stat-label { color: #8b949e; font-size: 0.9em; }
+        .comparison-table { width: 100%; border-collapse: collapse; margin: 1rem 0; }
+        .comparison-table th, .comparison-table td { border: 1px solid #30363d; padding: 8px 12px; text-align: left; }
+        .comparison-table th { background-color: #161b22; color: #8b949e; }
+    </style>
+</head>
+
+<body>
+
+    <h1>The Unimodal Pretraining Run</h1>
+    <span class="subtitle">TB-scale training with resilience and cost optimization</span>
+
+    <p>This demo illustrates how GREMLIN manages foundation model pretraining at scale—handling data sharding, Spot instance failures, and loss curve monitoring.</p>
+
+    <div class="stat-highlight">
+        <div class="stat-value">2.6 Trillion Tokens</div>
+        <div class="stat-label">Real-world Tempus pretraining corpus scale</div>
+    </div>
+
+    <h2 id="step-1">1. Data Sharding: "The Heavy Lift"</h2>
+    <span class="section-desc">Preparing TB-scale data for distributed training.</span>
+
+    <p><strong>Input</strong>:</p>
+    <blockquote>"I need to pretrain a BERT model on the 'pathology-reports-2024' corpus. Prepare the data for 128 nodes."</blockquote>
+    <br>
+
+    <div class="markdown-alert markdown-alert-tip">
+        <div class="markdown-alert-title">
+            <svg class="octicon" viewBox="0 0 16 16" version="1.1" width="16" height="16" fill="currentColor" style="margin-right: 8px;">
+                <path d="M8 1.5c-2.363 0-4 1.69-4 3.75 0 .984.424 1.625.984 2.304l.214.253c.223.264.47.556.673.848.284.411.537.896.621 1.49a.75.75 0 0 1-1.484.211c-.04-.282-.163-.547-.37-.847a8.456 8.456 0 0 0-.542-.68c-.084-.1-.173-.205-.268-.32C3.201 7.025 2.5 6.227 2.5 5.25 2.5 2.31 4.863 0 8 0s5.5 2.31 5.5 5.25c0 .977-.701 1.775-1.328 2.259-.095.115-.184.22-.268.319-.207.245-.383.453-.541.681-.208.3-.33.565-.37.847a.751.751 0 0 1-1.485-.212c.084-.593.337-1.078.621-1.489.203-.292.45-.584.673-.848.075-.088.147-.173.213-.253.561-.679.985-1.32.985-2.304 0-2.06-1.637-3.75-4-3.75ZM5.75 12h4.5a.75.75 0 0 1 0 1.5h-4.5a.75.75 0 0 1 0-1.5ZM6 15.25a.75.75 0 0 1 .75-.75h2.5a.75.75 0 0 1 0 1.5h-2.5a.75.75 0 0 1-.75-.75Z"></path>
+            </svg>
+            Key Concepts
+        </div>
+        <ul>
+            <li><strong>Automatic Analysis</strong>: GREMLIN calculates optimal shard count to avoid "straggler" GPUs.</li>
+            <li><strong>Streaming Buffer</strong>: 50GB buffer prevents I/O bottlenecks during training.</li>
+            <li><strong>No Manual Beam Pipelines</strong>: Ray Data cluster handles parallel tokenization.</li>
+        </ul>
+    </div>
+
+    <h2 id="step-2">2. Data Pipeline Execution</h2>
+    <span class="section-desc">Tokenizing and sharding 10TB of text.</span>
+
+    <p><strong>Input</strong>:</p>
+    <blockquote>"Y" (Launch Ray Data job)</blockquote>
+    <br>
+
+    <div class="markdown-alert markdown-alert-important">
+        <div class="markdown-alert-title">
+            <svg class="octicon" viewBox="0 0 16 16" version="1.1" width="16" height="16" fill="currentColor" style="margin-right: 8px;">
+                <path d="M0 1.75C0 .784.784 0 1.75 0h12.5C15.216 0 16 .784 16 1.75v9.5A1.75 1.75 0 0 1 14.25 13H8.06l-2.573 2.573A1.458 1.458 0 0 1 3 14.543V13H1.75A1.75 1.75 0 0 1 0 11.25Zm1.75-.25a.25.25 0 0 0-.25.25v9.5c0 .138.112.25.25.25h2a.75.75 0 0 1 .75.75v2.19l2.72-2.72a.75.75 0 0 1 .53-.22h6.5a.25.25 0 0 0 .25-.25v-9.5a.25.25 0 0 0-.25-.25Zm7 2.25v2.5a.75.75 0 0 1-1.5 0v-2.5a.75.75 0 0 1 1.5 0ZM9 9a1 1 0 1 1-2 0 1 1 0 0 1 2 0Z"></path>
+            </svg>
+            Insight: 256 Workers in Parallel
+        </div>
+        <p>The traditional approach would take 3 days with a custom Beam pipeline. GREMLIN completes this in ~4 hours by:</p>
+        <ul>
+            <li>Spinning up serverless Ray workers automatically</li>
+            <li>Parallel tokenization across all documents</li>
+            <li>Streaming writes to GCS with optimal shard sizes</li>
+        </ul>
+    </div>
+
+    <h2 id="step-3">3. Resilience: "The Spot Strategy"</h2>
+    <span class="section-desc">Cost optimization with automatic failure recovery.</span>
+
+    <p><strong>Input</strong>:</p>
+    <blockquote>"Train 'path-bert-large' on this data. Use Spot instances to save cost. Enable auto-recovery."</blockquote>
+    <br>
+
+    <div class="markdown-alert markdown-alert-warning">
+        <div class="markdown-alert-title">
+            <svg class="octicon" viewBox="0 0 16 16" version="1.1" width="16" height="16" fill="currentColor" style="margin-right: 8px;">
+                <path d="M6.457 1.047c.659-1.234 2.427-1.234 3.086 0l6.082 11.378A1.75 1.75 0 0 1 14.082 15H1.918a1.75 1.75 0 0 1-1.543-2.575Zm1.763.707a.25.25 0 0 0-.44 0L1.698 13.132a.25.25 0 0 0 .22.368h12.164a.25.25 0 0 0 .22-.368Zm.53 3.996v2.5a.75.75 0 0 1-1.5 0v-2.5a.75.75 0 0 1 1.5 0ZM9 11a1 1 0 1 1-2 0 1 1 0 0 1 2 0Z"></path>
+            </svg>
+            Cost Savings: $35,800 (72%)
+        </div>
+        <table class="comparison-table">
+            <tr>
+                <th>Strategy</th>
+                <th>Cost</th>
+                <th>Risk</th>
+            </tr>
+            <tr>
+                <td>On-Demand GPUs</td>
+                <td>$50,000</td>
+                <td>None</td>
+            </tr>
+            <tr style="background-color: #161b22;">
+                <td><strong>Spot + Auto-Recovery</strong></td>
+                <td><strong>$14,200</strong></td>
+                <td>Managed by GREMLIN</td>
+            </tr>
+        </table>
+    </div>
+
+    <h2 id="step-4">4. Auto-Recovery in Action</h2>
+    <span class="section-desc">Surviving hardware failures without human intervention.</span>
+
+    <p><strong>Input</strong>:</p>
+    <blockquote>"Y" (Submit with Spot instances)</blockquote>
+    <br>
+
+    <div class="markdown-alert markdown-alert-tip">
+        <div class="markdown-alert-title">
+            <svg class="octicon" viewBox="0 0 16 16" version="1.1" width="16" height="16" fill="currentColor" style="margin-right: 8px;">
+                <path d="M8 1.5c-2.363 0-4 1.69-4 3.75 0 .984.424 1.625.984 2.304l.214.253c.223.264.47.556.673.848.284.411.537.896.621 1.49a.75.75 0 0 1-1.484.211c-.04-.282-.163-.547-.37-.847a8.456 8.456 0 0 0-.542-.68c-.084-.1-.173-.205-.268-.32C3.201 7.025 2.5 6.227 2.5 5.25 2.5 2.31 4.863 0 8 0s5.5 2.31 5.5 5.25c0 .977-.701 1.775-1.328 2.259-.095.115-.184.22-.268.319-.207.245-.383.453-.541.681-.208.3-.33.565-.37.847a.751.751 0 0 1-1.485-.212c.084-.593.337-1.078.621-1.489.203-.292.45-.584.673-.848.075-.088.147-.173.213-.253.561-.679.985-1.32.985-2.304 0-2.06-1.637-3.75-4-3.75ZM5.75 12h4.5a.75.75 0 0 1 0 1.5h-4.5a.75.75 0 0 1 0-1.5ZM6 15.25a.75.75 0 0 1 .75-.75h2.5a.75.75 0 0 1 0 1.5h-2.5a.75.75 0 0 1-.75-.75Z"></path>
+            </svg>
+            Key Concepts
+        </div>
+        <ul>
+            <li><strong>Elastic Training</strong>: Ray Connect detects node loss and pauses gracefully.</li>
+            <li><strong>Auto-Acquisition</strong>: Replacement nodes acquired automatically.</li>
+            <li><strong>Checkpoint Resume</strong>: Training resumes from last checkpoint (every 500 steps).</li>
+            <li><strong>No 3AM Wake-Ups</strong>: Scientist sleeps while GREMLIN handles failures.</li>
+        </ul>
+    </div>
+
+    <h2 id="step-5">5. Monitoring: "The Flight Check"</h2>
+    <span class="section-desc">AI-powered loss curve analysis.</span>
+
+    <p><strong>Input</strong>:</p>
+    <blockquote>"How is the pretraining run going?"</blockquote>
+    <br>
+
+    <div class="markdown-alert markdown-alert-important">
+        <div class="markdown-alert-title">
+            <svg class="octicon" viewBox="0 0 16 16" version="1.1" width="16" height="16" fill="currentColor" style="margin-right: 8px;">
+                <path d="M0 1.75C0 .784.784 0 1.75 0h12.5C15.216 0 16 .784 16 1.75v9.5A1.75 1.75 0 0 1 14.25 13H8.06l-2.573 2.573A1.458 1.458 0 0 1 3 14.543V13H1.75A1.75 1.75 0 0 1 0 11.25Zm1.75-.25a.25.25 0 0 0-.25.25v9.5c0 .138.112.25.25.25h2a.75.75 0 0 1 .75.75v2.19l2.72-2.72a.75.75 0 0 1 .53-.22h6.5a.25.25 0 0 0 .25-.25v-9.5a.25.25 0 0 0-.25-.25Zm7 2.25v2.5a.75.75 0 0 1-1.5 0v-2.5a.75.75 0 0 1 1.5 0ZM9 9a1 1 0 1 1-2 0 1 1 0 0 1 2 0Z"></path>
+            </svg>
+            Insight: Beyond Metrics
+        </div>
+        <p>GREMLIN doesn't just report numbers—it provides AI analysis:</p>
+        <ul>
+            <li><strong>Chinchilla Comparison</strong>: Validates loss against optimal scaling laws.</li>
+            <li><strong>Anomaly Detection</strong>: Spots loss spikes and GPU utilization drops.</li>
+            <li><strong>Projection</strong>: Estimates final loss and completion time.</li>
+        </ul>
+    </div>
+
+    <h2 id="step-6">6. Alert Configuration</h2>
+    <span class="section-desc">Setting up proactive monitoring.</span>
+
+    <p><strong>Input</strong>:</p>
+    <blockquote>"Y" (Set up alert thresholds)</blockquote>
+    <br>
+
+    <div class="markdown-alert markdown-alert-tip">
+        <div class="markdown-alert-title">
+            <svg class="octicon" viewBox="0 0 16 16" version="1.1" width="16" height="16" fill="currentColor" style="margin-right: 8px;">
+                <path d="M8 1.5c-2.363 0-4 1.69-4 3.75 0 .984.424 1.625.984 2.304l.214.253c.223.264.47.556.673.848.284.411.537.896.621 1.49a.75.75 0 0 1-1.484.211c-.04-.282-.163-.547-.37-.847a8.456 8.456 0 0 0-.542-.68c-.084-.1-.173-.205-.268-.32C3.201 7.025 2.5 6.227 2.5 5.25 2.5 2.31 4.863 0 8 0s5.5 2.31 5.5 5.25c0 .977-.701 1.775-1.328 2.259-.095.115-.184.22-.268.319-.207.245-.383.453-.541.681-.208.3-.33.565-.37.847a.751.751 0 0 1-1.485-.212c.084-.593.337-1.078.621-1.489.203-.292.45-.584.673-.848.075-.088.147-.173.213-.253.561-.679.985-1.32.985-2.304 0-2.06-1.637-3.75-4-3.75ZM5.75 12h4.5a.75.75 0 0 1 0 1.5h-4.5a.75.75 0 0 1 0-1.5ZM6 15.25a.75.75 0 0 1 .75-.75h2.5a.75.75 0 0 1 0 1.5h-2.5a.75.75 0 0 1-.75-.75Z"></path>
+            </svg>
+            Key Concepts
+        </div>
+        <ul>
+            <li><strong>Tiered Alerts</strong>: Different actions for different severity levels.</li>
+            <li><strong>Auto-Recovery</strong>: Node preemptions handled automatically without alerts.</li>
+            <li><strong>Slack Integration</strong>: Scientists notified only when attention needed.</li>
+        </ul>
+    </div>
+
+    <h2>The Value of Managed Pretraining</h2>
+
+    <table class="comparison-table">
+        <tr>
+            <th>Without GREMLIN</th>
+            <th>With GREMLIN</th>
+        </tr>
+        <tr>
+            <td>Custom Beam pipelines (3 days)</td>
+            <td>Ray Data cluster (~4 hours)</td>
+        </tr>
+        <tr>
+            <td>Manual checkpoint recovery at 3AM</td>
+            <td>Automatic elastic training</td>
+        </tr>
+        <tr>
+            <td>On-demand GPUs ($50K)</td>
+            <td>Spot + auto-recovery ($14K)</td>
+        </tr>
+        <tr>
+            <td>Manual TensorBoard monitoring</td>
+            <td>AI-powered anomaly detection</td>
+        </tr>
+    </table>
+
+    <div class="stat-highlight">
+        <div class="stat-value">72% Cost Reduction</div>
+        <div class="stat-label">Through intelligent Spot instance management</div>
+    </div>
+
+    <script>
+        window.addEventListener('message', (event) => {
+            if (event.data && event.data.type === 'scrollToStep') {
+                const stepId = `step-${event.data.step}`;
+                const element = document.getElementById(stepId);
+                if (element) { element.scrollIntoView({ behavior: 'smooth', block: 'start' }); }
+            }
+        });
+    </script>
+
+</body>
+
+</html>

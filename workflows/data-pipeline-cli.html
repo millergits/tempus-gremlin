@@ -160,7 +160,7 @@
                 <!-- TEXT LOGO -->
                 <div>
                     <pre class="ascii-art gremlin-green text-[10px] md:text-xs leading-[1.1]">
-  ____ ____  _____ __  __ _     ___ _   _ 
+  ____ ____  _____ __  __ _     ___ _   _
  / ___|  _ \| ____|  \/  | |   |_ _| \ | |
 | |  _| |_) |  _| | |\/| | |    | ||  \| |
 | |_| |  _ <| |___| |  | | |___ | || |\  |
@@ -213,149 +213,90 @@
         // --- LINEAR SCENARIO SCRIPT ---
         const endToEndScenario = [
             {
-                user: "I want to train a fusion model on the Multiple Myeloma cohort (q225). Check if we have enough patients with RNA and valid 1L Time-on-Treatment.",
+                user: "TBD: Show me available data sources for the lung cancer project.",
                 ai: {
-                    think: "Invoking DataTools.check_cohort_availability('mm_curated_q225', ['rna', '1l_tot'])...",
+                    think: "Invoking DataTools.list_sources('lung_cancer')...",
                     response: `
-                        <div class="text-[#c9d1d9] mb-2">Scanning <span class="text-green-400">mm_curated_q225</span> (Total: 1,402 pts)...</div>
+                        <div class="text-[#c9d1d9] mb-2">Scanning available data sources for <span class="text-green-400">lung_cancer</span> project...</div>
                         <table class="term-table">
-                            <thead><tr><th>Criteria</th><th>Count</th><th>% Total</th><th>Status</th></tr></thead>
+                            <thead><tr><th>Source</th><th>Records</th><th>Last Updated</th><th>Status</th></tr></thead>
                             <tbody>
-                                <tr><td>Base Cohort</td><td>1,402</td><td>100%</td><td><span class="text-green-400">✅ Ready</span></td></tr>
-                                <tr><td>Has RNA</td><td>1,374</td><td>98%</td><td><span class="text-green-400">✅ Good Coverage</span></td></tr>
-                                <tr><td>Has 1L TOT</td><td>1,150</td><td>82%</td><td><span class="text-yellow-400">⚠️ High Attrition</span></td></tr>
-                                <tr class="bg-[#21262d] font-bold text-white"><td>Intersection</td><td>1,120</td><td>79%</td><td>✅ Valid for Training</td></tr>
+                                <tr><td>Clinical Records</td><td>45,230</td><td>2024-12-10</td><td><span class="text-green-400">✅ Ready</span></td></tr>
+                                <tr><td>Genomic Data</td><td>12,450</td><td>2024-12-08</td><td><span class="text-green-400">✅ Ready</span></td></tr>
+                                <tr><td>Imaging (CT)</td><td>8,920</td><td>2024-12-05</td><td><span class="text-yellow-400">⚠️ Processing</span></td></tr>
+                                <tr><td>Lab Results</td><td>156,780</td><td>2024-12-11</td><td><span class="text-green-400">✅ Ready</span></td></tr>
                             </tbody>
                         </table>
-                        <div class="mb-4 text-[#8b949e] italic text-xs border-l-2 border-[#30363d] pl-2">
-                            > Note: 1L TOT drop-off is due to missing 'end_date' in 'onco_regimen'.
-                        </div>
-                        <div class="text-[#c9d1d9]"><strong>Action:</strong> Create pinned dataset split <span class="text-purple-400">mm_fusion_v1</span> with these 1,120 patients?</div>
+                        <div class="text-[#c9d1d9]"><strong>Action:</strong> Would you like to create a unified dataset from these sources?</div>
                     `
                 }
             },
             {
-                user: "Yes, create it.",
+                user: "TBD: Yes, create a unified dataset combining clinical and genomic data.",
                 ai: {
-                    think: "Invoking DataTools.create_cohort_split()... Materializing in Atlas...",
+                    think: "Invoking DataTools.create_unified_dataset()... Validating schema compatibility...",
                     response: `
-                        <div class="text-green-400 mb-1">✔ Done.</div>
-                        <div class="text-[#c9d1d9]">Dataset Created: <span class="text-green-400 underline cursor-pointer">atlas://datasets/mm_fusion_v1</span></div>
-                        <div class="text-[#8b949e] text-xs">Pinned to sha256:a8f9e2...</div>
-                    `
-                }
-            },
-            {
-                user: "Configure a Late Fusion experiment. Use the best frozen RNA encoder from 'v3-experiments', standard Clinical encoder, target 'overall_survival'. Use our new dataset.",
-                ai: {
-                    think: "Querying Atlas Registry... Generating YAML config...",
-                    response: `
-                        <div class="text-[#c9d1d9] mb-2">Found best upstream RNA encoder: <strong class="text-green-400">rn_8f92x</strong> (C-Index 0.72).</div>
-                        <div class="text-[#c9d1d9] mb-2">Generated config <span class="text-purple-400">exp_fusion_mm_os.yaml</span>. Diff:</div>
-                        
+                        <div class="text-green-400 mb-1">✔ Schema validation passed.</div>
+                        <div class="text-[#c9d1d9] mb-2">Creating unified dataset...</div>
                         <div class="bg-[#161b22] p-3 rounded border border-[#30363d] font-mono text-xs mb-4">
-                            <div class="diff-header">model:</div>
-                            <div class="diff-header">&nbsp;&nbsp;architecture: late_fusion</div>
-                            <div class="diff-add">+&nbsp;&nbsp;encoders:</div>
-                            <div class="diff-add">+&nbsp;&nbsp;&nbsp;&nbsp;rna: { checkpoint: "atlas://artifacts/rn_8f92x", trainable: false }</div>
-                            <div class="diff-add">+&nbsp;&nbsp;&nbsp;&nbsp;clinical: { checkpoint: "atlas://registry/cl_base_v2" }</div>
-                            <div class="diff-header">data:</div>
-                            <div class="diff-add">+&nbsp;&nbsp;dataset: "atlas://datasets/mm_fusion_v1"</div>
-                            <div class="diff-header">&nbsp;&nbsp;batch_size: 32 <span class="text-[#8b949e]"># Tuned for A100-40GB</span></div>
+                            <div class="diff-header">dataset_config:</div>
+                            <div class="diff-add">+  name: "lung_cancer_unified_v1"</div>
+                            <div class="diff-add">+  sources: ["clinical", "genomic"]</div>
+                            <div class="diff-add">+  join_key: "patient_id"</div>
+                            <div class="diff-add">+  records: 11,842 (intersection)</div>
                         </div>
-                        <div class="text-[#c9d1d9]">Validation Passed. <strong>Execute run? [Y/n]</strong></div>
+                        <div class="text-[#c9d1d9]">Dataset Created: <span class="text-green-400 underline cursor-pointer">atlas://datasets/lung_cancer_unified_v1</span></div>
+                        <div class="text-[#8b949e] text-xs">Pinned to sha256:c4d8f1...</div>
                     `
                 }
             },
             {
-                user: "Y",
+                user: "TBD: Run data quality checks on the new dataset.",
                 ai: {
-                    think: "Submitting Ray Job to Hypernexus...",
+                    think: "Invoking DataQuality.run_checks('lung_cancer_unified_v1')...",
                     response: `
-                        <div class="text-[#c9d1d9]">🚀 Job <span class="text-purple-400">job-d92a-fusion</span> submitted to Hypernexus (us-central1).</div>
-                        <div class="text-[#8b949e] mt-2 text-xs font-mono">
-                            [INFO] Initializing distributed group...<br>
-                            [INFO] Loaded RNA weights (2.3s)<br>
-                            [INFO] Training started. Epoch 0/20...<br>
-                            <span class="text-green-400">[SUCCESS] Job completed in 42m 12s.</span>
-                        </div>
+                        <div class="text-[#c9d1d9] mb-2">Running comprehensive data quality checks...</div>
+                        <table class="term-table">
+                            <thead><tr><th>Check</th><th>Result</th><th>Details</th></tr></thead>
+                            <tbody>
+                                <tr><td>Missing Values</td><td><span class="text-green-400">✅ Pass</span></td><td>< 2% missing across all columns</td></tr>
+                                <tr><td>Duplicate Records</td><td><span class="text-green-400">✅ Pass</span></td><td>0 duplicates found</td></tr>
+                                <tr><td>Schema Validation</td><td><span class="text-green-400">✅ Pass</span></td><td>All types match expected</td></tr>
+                                <tr><td>Outlier Detection</td><td><span class="text-yellow-400">⚠️ Warning</span></td><td>12 records flagged for review</td></tr>
+                            </tbody>
+                        </table>
+                        <div class="text-[#c9d1d9]">Overall: <span class="text-green-400">Dataset is ready for analysis</span></div>
                     `
                 }
             },
             {
-                user: "How did it do? Interpret the results.",
+                user: "TBD: Show me the flagged outlier records.",
                 ai: {
-                    think: "Invoking BenchTools.evaluate_survival()... Analyzing plots...",
+                    think: "Invoking DataQuality.get_outliers('lung_cancer_unified_v1')...",
                     response: `
-                        <div class="mb-4">
-                            <div class="text-[#8b949e] text-xs uppercase font-bold mb-1">Scorecard</div>
-                            <table class="term-table" style="width: 60%">
-                                <tr><td>C-Index</td><td class="font-bold text-white">0.68</td><td class="text-red-400">🔻 -0.04 (vs Baseline)</td></tr>
-                                <tr><td>Hazard Ratio</td><td>1.45</td><td class="text-green-400">✅ Significant (p < 0.005)</td></tr>
-                            </table>
-                        </div>
-
-                        <div class="border-l-2 border-[#d29922] pl-4 py-1 bg-[#d29922]/10 mb-4">
-                            <div class="text-[#d29922] font-bold text-sm mb-1">🧐 AI Analysis: Anomaly Detected</div>
-                            <div class="text-[#c9d1d9] text-sm leading-relaxed">
-                                1. <strong>Crossing Curves:</strong> Kaplan-Meier curves cross at t=18 months. Violates Proportional Hazards.
-                                <br>
-                                2. <strong>Embedding Warning:</strong> Metadata shows <code class="text-[#d29922] bg-[#d29922]/20 px-1 rounded">nearest_neighbor</code> embeddings. This often causes leakage.
-                            </div>
-                        </div>
-
-                        <div class="text-[#c9d1d9]">
-                            <strong>Suggestion:</strong> Run an <strong>ablation study</strong> (Clinical-Only) to verify signal strength?
-                        </div>
+                        <div class="text-[#c9d1d9] mb-2">Displaying 12 flagged records:</div>
+                        <table class="term-table" style="width: 80%">
+                            <thead><tr><th>Patient ID</th><th>Issue</th><th>Field</th><th>Value</th></tr></thead>
+                            <tbody>
+                                <tr><td>PT-4521</td><td>Age > 120</td><td>age_at_diagnosis</td><td>145</td></tr>
+                                <tr><td>PT-7832</td><td>Negative value</td><td>tumor_size_mm</td><td>-2.5</td></tr>
+                                <tr><td>PT-9012</td><td>Future date</td><td>diagnosis_date</td><td>2025-03-15</td></tr>
+                                <tr><td colspan="4" class="text-[#8b949e]">... 9 more records</td></tr>
+                            </tbody>
+                        </table>
+                        <div class="text-[#c9d1d9]"><strong>Action:</strong> Exclude these records from the dataset?</div>
                     `
                 }
             },
             {
-                user: "Yes, run the ablation.",
+                user: "TBD: Yes, exclude them and create a cleaned version.",
                 ai: {
-                    think: "Submitting ablation job...",
+                    think: "Invoking DataTools.filter_records()... Creating cleaned dataset...",
                     response: `
-                        <div class="text-green-400">✔ Ablation job submitted: job-e45b-ablation</div>
-                        <div class="text-[#8b949e] text-xs">Monitoring progress...</div>
-                    `
-                }
-            },
-            {
-                user: "Check the status of the ablation job.",
-                ai: {
-                    think: "Invoking Hypernexus.get_job('job-e45b-ablation')... Fetching metrics from ofm-bench...",
-                    response: `
-                        <div class="text-[#c9d1d9] mb-2">Job <span class="text-purple-400">job-e45b-ablation</span> is <strong class="text-green-400">COMPLETE</strong>.</div>
-                        
-                        <div class="mb-4">
-                            <div class="text-[#8b949e] text-xs uppercase font-bold mb-1">Comparison: Clinical-Only vs Fusion</div>
-                            <table class="term-table" style="width: 70%">
-                                <thead><tr><th>Metric</th><th>Fusion</th><th>Clinical-Only</th><th>Delta</th></tr></thead>
-                                <tbody>
-                                    <tr><td>C-Index</td><td class="text-[#8b949e]">0.68</td><td class="font-bold text-white">0.71</td><td class="text-green-400">▲ +0.03</td></tr>
-                                    <tr><td>Hazard Ratio</td><td class="text-[#8b949e]">1.45</td><td class="font-bold text-white">1.62</td><td class="text-green-400">▲ Better Separation</td></tr>
-                                </tbody>
-                            </table>
-                        </div>
-
-                        <div class="text-[#c9d1d9] border-l-2 border-green-500 pl-3 text-sm">
-                            <strong>Conclusion:</strong> The Clinical-Only model outperforms the Fusion model. This confirms the hypothesis that the RNA modality (or its embedding method) was introducing noise to the signal.
-                        </div>
-                    `
-                }
-            },
-            {
-                user: "Okay, deploy the Clinical-Only model to Inferno.",
-                ai: {
-                    think: "Invoking Inferno.deploy_model('job-e45b-ablation')... Configuring KServe...",
-                    response: `
-                        <div class="text-green-400 mb-1">✔ Deployment Successful.</div>
-                        <div class="text-[#c9d1d9]">Model: <strong class="text-white">cl_unimodal_v2</strong></div>
-                        <div class="text-[#c9d1d9]">Target: <span class="text-purple-400">inferno-batch</span> namespace</div>
-                        <div class="mt-2 bg-[#161b22] p-3 rounded border border-[#30363d] font-mono text-xs text-[#8b949e]">
-                            Endpoint: https://inferno-internal.tempus.com/v1/models/mm-clinical-survival<br>
-                            Status: <span class="text-green-400">Healthy (2/2 Replicas)</span>
-                        </div>
+                        <div class="text-green-400 mb-1">✔ 12 records excluded.</div>
+                        <div class="text-[#c9d1d9]">Cleaned Dataset: <span class="text-green-400 underline cursor-pointer">atlas://datasets/lung_cancer_unified_v1_clean</span></div>
+                        <div class="text-[#c9d1d9] mt-2">Final record count: <strong class="text-white">11,830</strong></div>
+                        <div class="text-[#8b949e] text-xs mt-2">Lineage tracked: lung_cancer_unified_v1 → lung_cancer_unified_v1_clean</div>
                     `
                 }
             }
@@ -376,7 +317,7 @@
             // Add start divider
             const div = document.createElement('div');
             div.className = "my-4 border-t border-dashed border-slate-700 pt-2 text-center text-xs text-slate-600";
-            div.innerText = `--- NEW SESSION: END-TO-END DEMO ---`;
+            div.innerText = `--- NEW SESSION: DATA PIPELINE DEMO ---`;
             elements.history.appendChild(div);
             prepareStep();
         }
@@ -393,9 +334,6 @@
                 endDiv.innerText = "[ END OF DEMO SCENARIO ]";
                 elements.history.appendChild(endDiv);
                 scrollToBottom();
-
-                // Notify parent that workflow is complete
-                window.parent.postMessage({ type: 'workflowComplete' }, '*');
                 return;
             }
             state.targetText = endToEndScenario[state.step].user;
